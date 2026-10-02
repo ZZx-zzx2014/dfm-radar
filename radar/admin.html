@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DFM · 管理员面板（房间总览）</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121a23; --panel2:#0f161e; --line:#1f2b38;
+    --fg:#e6edf3; --dim:#8b9bb0; --accent:#35c2a5; --warn:#ffb020;
+    --ally:#7ce4cd; --enemy:#ff5252; --item:#ffd040;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:13.5px/1.55 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  header{display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+         padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  h1{font-size:15px;margin:0 10px 0 0;letter-spacing:2px;font-weight:600;white-space:nowrap}
+  h1 span{color:var(--accent)}
+  input,select,button{font:inherit;color:var(--fg);background:var(--panel2);
+                      border:1px solid var(--line);border-radius:8px;padding:6px 9px;outline:none}
+  input#q{width:120px}
+  button{cursor:pointer;background:var(--accent);color:#06231d;border:none;font-weight:600}
+  button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);font-weight:400}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 16px;
+       background:var(--panel2);border-bottom:1px solid var(--line)}
+  .prog{height:7px;border-radius:4px;background:var(--line);overflow:hidden;flex:1 1 160px;min-width:140px}
+  .prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+  .stats{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 16px;font-size:12.5px;color:var(--dim);
+         border-bottom:1px solid var(--line)}
+  .stats b{color:var(--fg)}
+  .wrap{padding:0 0 30px}
+  .scroll{max-height:calc(100vh - 190px);overflow:auto}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{position:sticky;top:0;background:var(--panel);color:var(--dim);font-weight:500;font-size:12px;z-index:1}
+  th.sortable{cursor:pointer}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr:hover{background:#16212c}
+  tbody tr.clk{cursor:pointer}
+  .name{max-width:430px;white-space:normal;word-break:break-all}
+  .p{display:inline-block;padding:0 6px;margin:1px 3px 1px 0;border-radius:5px;font-size:11.5px;
+     border:1px solid rgba(255,255,255,.12)}
+  .p.a{color:var(--ally);border-color:rgba(124,228,205,.35)}
+  .p.e{color:var(--enemy);border-color:rgba(255,82,82,.3)}
+  .empty{padding:26px;text-align:center;color:var(--dim)}
+  .warnbox{margin:10px 16px 0;padding:9px 13px;border-radius:9px;
+           background:#2a2213;border:1px solid #4a3a18;color:var(--warn);font-size:12.5px}
+  .tag{font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--dim)}
+</style>
+</head>
+<body>
+<header>
+  <h1>DFM <span>· 管理员面板</span></h1>
+  <input id="q" placeholder="搜房间/玩家" autocomplete="off">
+  <label class="tag" style="border:none">范围
+    <select id="range">
+      <option value="all" selected>全部 1000~5999</option>
+      <option value="1">1 号 1000~1999</option>
+      <option value="2">2 号 2000~2999</option>
+      <option value="3">3 号 3000~3999</option>
+      <option value="4">4 号 4000~4999</option>
+      <option value="5">5 号 5000~5999</option>
+    </select>
+  </label>
+  <label class="tag" style="border:none">每节点并发
+    <select id="conc">
+      <option value="8">8（最稳）</option>
+      <option value="15" selected>15（推荐）</option>
+      <option value="25">25</option>
+      <option value="40">40（激进）</option>
+    </select>
+  </label>
+  <label class="tag" style="border:none">连接
+    <select id="mode">
+      <option value="direct">直连节点</option>
+      <option value="local">本地中继</option>
+      <option value="wss">公网 wss 中继</option>
+    </select>
+  </label>
+  <input id="wssurl" style="width:230px" placeholder="wss://imac-1.tailbdb43.ts.net/ws?room=" autocomplete="off">
+  <button id="scan">开始扫描</button>
+  <button id="stop" class="ghost" disabled>停止</button>
+  <label class="tag" style="border:none"><input type="checkbox" id="auto"> 自动刷新</label>
+</header>
+
+<div class="bar">
+  <div class="prog"><i id="pv"></i></div>
+  <span id="pct" style="color:var(--dim);font-size:12.5px;min-width:120px">未开始</span>
+</div>
+
+<div class="stats">
+  <span>有数据 <b id="cActive">0</b></span>
+  <span>未进入 <b id="cNot">0</b></span>
+  <span>已关闭 <b id="cClosed">0</b></span>
+  <span>失败 <b id="cFail">0</b></span>
+  <span>｜ 总在线 <b id="cPeers">0</b></span>
+  <span>我方玩家 <b id="cAlly">0</b></span>
+  <span>敌方玩家 <b id="cEnemy">0</b></span>
+  <span>｜ 总价值 <b id="cTotal">0</b></span>
+  <span>｜ 用时 <b id="cTime">0s</b></span>
+</div>
+
+<div id="notice"></div>
+
+<div class="wrap"><div class="scroll">
+  <table>
+    <thead><tr>
+      <th class="sortable" data-k="room">房间</th>
+      <th class="sortable" data-k="node">节点</th>
+      <th class="sortable" data-k="map">地图</th>
+      <th class="sortable num" data-k="peers">在线</th>
+      <th class="sortable num" data-k="na">我方</th>
+      <th class="sortable num" data-k="ne">敌方</th>
+      <th class="sortable num" data-k="nb">人机</th>
+      <th>我方玩家</th>
+      <th>敌方玩家</th>
+      <th class="sortable num" data-k="items">带价物品</th>
+      <th class="sortable num" data-k="total">总价值</th>
+    </tr></thead>
+    <tbody id="rows"><tr><td colspan="11" class="empty">还没扫描。选范围，点「开始扫描」。</td></tr></tbody>
+  </table>
+</div></div>
+
+<script>
+(function(){
+  "use strict";
+  var NODES = {
+    1:["cheap-host1.cheapyun.com",12831], 2:["cheap-host1.cheapyun.com",17681],
+    3:["cheap-host1.cheapyun.com",48303], 4:["cheap-host1.cheapyun.com",13699],
+    5:["cheap-host1.cheapyun.com",41092]
+  };
+  var NODE_RANGES = [[1000,1999,1],[2000,2999,2],[3000,3999,3],[4000,4999,4],[5000,5999,5]];
+  var MAPS = {Brakkesh:"巴克什",SpaceCenter:"航天基地",ZeroDam:"零号大坝",Dam_Iris:"零号大坝",
+              Layali:"长弓溪谷",Forrest:"长弓溪谷","AZ-5":"核电站",Valley:"山谷",Tide:"潮汐监狱"};
+  var LOCAL = "ws://127.0.0.1:8898/ws?room=";
+
+  var $=function(id){return document.getElementById(id);};
+  function fmt(v){ return (v||0).toLocaleString("en-US"); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function cn(m){ return MAPS[m]||m||"?"; }
+
+  function mode(){ var e=$("mode"); return e?e.value:"direct"; }
+  function wsUrl(host, port, room){
+    var m = mode();
+    if(m==="local") return LOCAL + room;
+    if(m==="wss"){
+      var b = ($("wssurl")&&$("wssurl").value.trim()) || "wss://imac-1.tailbdb43.ts.net/ws?room=";
+      if(b.indexOf("room=")<0) b = b.replace(/\/+$/,"") + "/ws?room=";
+      return b + room;
+    }
+    return "ws://" + host + ":" + port + "/ws?room=" + room;
+  }
+
+  var scanning=false, rows=[], stat=null, t0=0, firstErr="";
+  function noteErr(m){ if(!firstErr) firstErr=m; }
+
+  function probe(n, nid, cb){
+    var room = String(n).padStart(4,"0");
+    var nt = NODES[nid], host = nt[0], port = nt[1];
+    var done=false, w=null;
+    var tm = setTimeout(function(){ finish({room:room,node:nid,status:"timeout"}); }, 5000);
+    function finish(res){
+      if(done) return; done=true; clearTimeout(tm);
+      if(w){ try{ w.onopen=w.onmessage=w.onerror=w.onclose=null; w.close(); }catch(e){} }
+      cb(res);
+    }
+    try{ w = new WebSocket(wsUrl(host, port, room)); }
+    catch(e){ noteErr("创建 WebSocket 失败："+e.name+" "+e.message); return finish({room:room,node:nid,status:"fail"}); }
+    w.onopen = function(){ try{ w.send(JSON.stringify({type:"hello",clientType:"web",room:room,clientName:"dfm-radar",version:2})); }catch(e){} };
+    w.onmessage = function(ev){
+      var d; try{ d = JSON.parse(ev.data); }catch(e){ return; }
+      if(d.type==="welcome"){
+        var ns=(d.state&&d.state.nativeState)||{}, mk=ns.markers||[];
+        var allies=mk.filter(function(m){return m.kind==="ally";});
+        var enemies=mk.filter(function(m){return m.kind==="player";});
+        var bots=mk.filter(function(m){return m.kind==="bot";});
+        var items=mk.filter(function(m){return m.kind==="item"&&m.price;});
+        finish({ room:room, node:nid,
+                 status: ns.available===false ? "notentered" : "active",
+                 map: MAPS[ns.levelName]||ns.levelName||"",
+                 peers: d.peers||0,
+                 na: allies.length, ne: enemies.length, nb: bots.length,
+                 an: allies.map(function(m){return m.label;}).slice(0,20),
+                 en: enemies.map(function(m){return m.label;}).slice(0,20),
+                 items: items.length,
+                 total: items.reduce(function(s,x){return s+(x.price||0);},0) });
+      } else if(d.type==="error"){
+        finish({room:room,node:nid,status:(d.code==="room-not-found"?"closed":"other"),code:d.code});
+      }
+    };
+    w.onerror = function(){ noteErr("连接被拒绝/中断（浏览器可能拦了 ws://）"); finish({room:room,node:nid,status:"fail"}); };
+    w.onclose = function(ev){ if(!done && ev && ev.code && ev.code!==1000) noteErr("连接关闭 code="+ev.code); finish({room:room,node:nid,status:"fail"}); };
+  }
+
+  var sortKey="total", sortAsc=false;
+  function paint(){
+    var done=stat.done, total=stat.total;
+    var p = total ? (100*done/total) : 0;
+    $("pv").style.width = p.toFixed(1)+"%";
+    $("pct").textContent = done+"/"+total+"  ("+p.toFixed(0)+"%)";
+    $("cActive").textContent=stat.active; $("cNot").textContent=stat.notentered;
+    $("cClosed").textContent=stat.closed; $("cFail").textContent=stat.fail;
+    $("cPeers").textContent=stat.peers; $("cAlly").textContent=stat.ally;
+    $("cEnemy").textContent=stat.enemy; $("cTotal").textContent=fmt(stat.totalV);
+    $("cTime").textContent=((Date.now()-t0)/1000).toFixed(1)+"s";
+  }
+
+  function shown(){
+    var q=($("q").value||"").trim().toLowerCase();
+    var list=rows.filter(function(r){
+      if(!q) return true;
+      if(r.room.indexOf(q)>=0) return true;
+      if((r.map||"").toLowerCase().indexOf(q)>=0) return true;
+      return (r.an||[]).concat(r.en||[]).some(function(n){ return String(n).toLowerCase().indexOf(q)>=0; });
+    });
+    list.sort(function(a,b){
+      var x=a[sortKey], y=b[sortKey];
+      if(sortKey==="room"){ x=+x; y=+y; }
+      if(typeof x==="string"){ return sortAsc? (x>y?1:-1) : (x<y?1:-1); }
+      return sortAsc ? (x-y) : (y-x);
+    });
+    return list;
+  }
+
+  function renderRows(){
+    var list=shown(), tb=$("rows");
+    if(!list.length){ tb.innerHTML='<tr><td colspan="11" class="empty">没有匹配的房间。</td></tr>'; return; }
+    tb.innerHTML = list.slice(0,600).map(function(r){
+      var not = r.status==="notentered";
+      var an=(r.an||[]).map(function(n){return '<span class="p a">'+esc(n)+'</span>';}).join("");
+      var en=(r.en||[]).map(function(n){return '<span class="p e">'+esc(n)+'</span>';}).join("");
+      return '<tr class="clk" data-room="'+r.room+'">'+
+        '<td><b>'+r.room+'</b>'+(not?' <span class="tag">未进入</span>':'')+'</td>'+
+        '<td>'+r.node+'</td><td>'+(not?'—':esc(cn(r.map)))+'</td>'+
+        '<td class="num">'+r.peers+'</td>'+
+        '<td class="num" style="color:var(--ally)">'+(r.na||0)+'</td>'+
+        '<td class="num" style="color:var(--enemy)">'+(r.ne||0)+'</td>'+
+        '<td class="num">'+(r.nb||0)+'</td>'+
+        '<td class="name">'+(an||'<span style="color:var(--dim)">—</span>')+'</td>'+
+        '<td class="name">'+(en||'<span style="color:var(--dim)">—</span>')+'</td>'+
+        '<td class="num">'+r.items+'</td>'+
+        '<td class="num"><b>'+fmt(r.total)+'</b></td></tr>';
+    }).join("");
+  }
+
+  function bump(r){
+    stat.done++;
+    if(r){
+      if(r.status==="active"){
+        stat.active++; rows.push(r);
+        stat.peers+=r.peers; stat.ally+=(r.na||0); stat.enemy+=(r.ne||0); stat.totalV+=r.total;
+      } else if(r.status==="notentered"){ stat.notentered++; rows.push(r); }
+      else if(r.status==="closed") stat.closed++;
+      else { stat.fail++; if(r.code) noteErr("服务端错误码："+r.code); }
+    } else stat.fail++;
+    if(stat.done % 20 === 0 || stat.done === stat.total){ paint(); renderRows(); }
+  }
+
+  async function worker(nid, lo, hi, conc){
+    var next=lo;
+    async function one(){
+      while(scanning && next<=hi){
+        var n=next++;
+        await new Promise(function(res){ probe(n, nid, function(r){ bump(r); res(); }); });
+      }
+    }
+    var arr=[]; for(var i=0;i<conc;i++) arr.push(one());
+    await Promise.all(arr);
+  }
+
+  function startScan(){
+    if(scanning) return;
+    var sel=$("range").value;
+    var ranges = (sel==="all") ? NODE_RANGES.map(function(r){return r.slice();}) : [NODE_RANGES[+sel-1].slice()];
+    var conc=parseInt($("conc").value,10);
+    var total=ranges.reduce(function(s,r){ return s+(r[1]-r[0]+1); },0);
+
+    scanning=true; rows=[]; t0=Date.now(); firstErr="";
+    stat={done:0,total:total,active:0,notentered:0,closed:0,fail:0,peers:0,ally:0,enemy:0,totalV:0};
+    $("scan").disabled=true; $("stop").disabled=false;
+    $("range").disabled=true; $("conc").disabled=true; $("mode").disabled=true;
+    $("notice").innerHTML="";
+    paint(); renderRows();
+
+    Promise.all(ranges.map(function(r){ return worker(r[2], r[0], r[1], conc); })).then(function(){
+      scanning=false;
+      $("scan").disabled=false; $("stop").disabled=true;
+      $("range").disabled=false; $("conc").disabled=false; $("mode").disabled=false;
+      paint(); renderRows();
+      if(stat.fail>0){
+        $("notice").innerHTML='<div class="warnbox">本次有 <b>'+stat.fail+'</b> 个房间失败。'+
+          (firstErr?('首个原因：<code>'+esc(firstErr)+'</code>'):'')+
+          '　<i>失败偏多通常是并发过高被服务端限流，把「每节点并发」调低再扫。</i></div>';
+      }
+      if($("auto").checked && !scanning) setTimeout(function(){ if($("auto").checked) startScan(); }, 60000);
+    });
+  }
+
+  $("scan").addEventListener("click", startScan);
+  $("stop").addEventListener("click", function(){ scanning=false; $("stop").disabled=true; $("pct").textContent+=" · 已停止"; });
+  $("q").addEventListener("input", renderRows);
+  document.querySelectorAll("th.sortable").forEach(function(th){
+    th.addEventListener("click", function(){
+      var k=th.getAttribute("data-k");
+      if(sortKey===k) sortAsc=!sortAsc; else { sortKey=k; sortAsc=false; }
+      renderRows();
+    });
+  });
+  $("rows").addEventListener("click", function(e){
+    var tr=e.target.closest("tr[data-room]"); if(!tr) return;
+    var room=tr.getAttribute("data-room");
+    // 复制房间号（官方页面的房间号输入框没法从外部直接驱动，复制最稳）
+    try{ navigator.clipboard.writeText(room); }catch(_){}
+    var old=tr.querySelector("td").innerHTML;
+    tr.querySelector("td").innerHTML='<b>'+room+'</b> 已复制';
+    setTimeout(function(){ tr.querySelector("td").innerHTML=old; }, 900);
+  });
+
+  if(location.protocol==="https:"){ $("mode").value="wss"; }
+  try{
+    ["mode","wssurl"].forEach(function(id){
+      var e=$(id); if(!e) return;
+      var v=localStorage.getItem("dfm_admin_"+id); if(v) e.value=v;
+      e.addEventListener("change", function(){ try{localStorage.setItem("dfm_admin_"+id, e.value);}catch(_){} });
+      e.addEventListener("input",  function(){ try{localStorage.setItem("dfm_admin_"+id, e.value);}catch(_){} });
+    });
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
