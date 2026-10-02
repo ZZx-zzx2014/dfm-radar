@@ -2,109 +2,193 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DFM · 管理员面板（房间总览）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>DFM · 管理员面板</title>
 <style>
   :root{
-    --bg:#0b0f14; --panel:#121a23; --panel2:#0f161e; --line:#1f2b38;
-    --fg:#e6edf3; --dim:#8b9bb0; --accent:#35c2a5; --warn:#ffb020;
-    --ally:#7ce4cd; --enemy:#ff5252; --item:#ffd040;
+    --bg:#080c11; --bg2:#0d131a; --card:#111a23; --card2:#0f1720;
+    --line:#1d2836; --line2:#243244;
+    --fg:#e8eef5; --dim:#8296ab; --dim2:#5d7086;
+    --accent:#2fd2a8; --accent2:#1fa88a;
+    --ally:#5fe3c0; --enemy:#ff5f6d; --gold:#ffc84a; --bot:#8fa3b8;
+    --r:14px; --r2:10px;
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);
-       font:13.5px/1.55 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-  header{display:flex;flex-wrap:wrap;gap:9px;align-items:center;
-         padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
-  h1{font-size:15px;margin:0 10px 0 0;letter-spacing:2px;font-weight:600;white-space:nowrap}
-  h1 span{color:var(--accent)}
-  input,select,button{font:inherit;color:var(--fg);background:var(--panel2);
-                      border:1px solid var(--line);border-radius:8px;padding:6px 9px;outline:none}
-  input#q{width:120px}
-  button{cursor:pointer;background:var(--accent);color:#06231d;border:none;font-weight:600}
-  button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);font-weight:400}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 16px;
-       background:var(--panel2);border-bottom:1px solid var(--line)}
-  .prog{height:7px;border-radius:4px;background:var(--line);overflow:hidden;flex:1 1 160px;min-width:140px}
-  .prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
-  .stats{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 16px;font-size:12.5px;color:var(--dim);
-         border-bottom:1px solid var(--line)}
-  .stats b{color:var(--fg)}
-  .wrap{padding:0 0 30px}
-  .scroll{max-height:calc(100vh - 190px);overflow:auto}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{position:sticky;top:0;background:var(--panel);color:var(--dim);font-weight:500;font-size:12px;z-index:1}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(180deg,#0a1017 0%,#080c11 240px);
+    color:var(--fg); min-height:100vh;
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  /* ---------- 顶栏 ---------- */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:rgba(10,16,23,.92); backdrop-filter:saturate(180%) blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+  }
+  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  h1{margin:0;font-size:16px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+  h1 i{font-style:normal;color:var(--accent)}
+  .spacer{flex:1}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    border:1px solid var(--line2); background:#131d27; color:var(--fg);
+    border-radius:var(--r2); padding:7px 12px; font-size:13px; cursor:pointer;
+    transition:.15s; font-weight:500;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--accent);border-color:transparent;color:#06231d;font-weight:700}
+  .btn.ghost{background:transparent;color:var(--dim)}
+  .btn:disabled{opacity:.45}
+  .btn .ic{font-size:14px;line-height:1}
+  .searchwrap{position:relative;flex:1 1 190px;min-width:150px}
+  .searchwrap input{
+    width:100%; padding:8px 11px 8px 32px; font-size:14px;
+    background:#0c141c; border:1px solid var(--line2); border-radius:var(--r2);
+    color:var(--fg); outline:none;
+  }
+  .searchwrap input:focus{border-color:var(--accent2)}
+  .searchwrap::before{
+    content:"🔍"; position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    font-size:12px; opacity:.6; pointer-events:none;
+  }
+  /* ---------- 统计 ---------- */
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(78px,1fr)); gap:8px;
+    padding:10px 14px 0;
+  }
+  .st{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r2);
+    padding:8px 10px;
+  }
+  .st b{display:block;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
+  .st span{font-size:11px;color:var(--dim)}
+  .st.ally b{color:var(--ally)} .st.enemy b{color:var(--enemy)}
+  .st.val b{color:var(--gold)}
+  /* ---------- 过滤条 ---------- */
+  .filters{
+    display:flex;gap:8px;overflow-x:auto;padding:10px 14px;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .filters::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none; border:1px solid var(--line2); background:#101a23; color:var(--dim);
+    border-radius:999px; padding:6px 13px; font-size:12.5px; cursor:pointer; white-space:nowrap;
+    transition:.15s;
+  }
+  .chip.on{background:var(--accent);border-color:transparent;color:#06231d;font-weight:700}
+  .srcbar{
+    display:flex;align-items:center;gap:8px;padding:0 14px 10px;font-size:11.5px;color:var(--dim2);
+    flex-wrap:wrap;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;
+       box-shadow:0 0 8px var(--accent)}
+  .dot.off{background:var(--dim2);box-shadow:none}
+  /* ---------- 卡片列表 ---------- */
+  .list{padding:4px 14px 40px;display:grid;gap:10px}
+  @media(min-width:900px){ .list{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))} }
+  .room{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+    padding:11px 12px; cursor:pointer; transition:.15s; position:relative; overflow:hidden;
+  }
+  .room:active{transform:scale(.985)}
+  .room.hot{border-color:rgba(255,200,74,.42)}
+  .room.hot::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+  .room.idle{opacity:.72}
+  .r1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .rno{font-size:18px;font-weight:800;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+  .node{font-size:11px;color:var(--dim2);border:1px solid var(--line2);border-radius:5px;padding:0 5px}
+  .map{font-size:13px;color:var(--dim)}
+  .val{margin-left:auto;font-size:16px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+  .val.zero{color:var(--dim2);font-weight:600;font-size:14px}
+  .r2{display:flex;gap:12px;margin-top:7px;font-size:12.5px;color:var(--dim);flex-wrap:wrap}
+  .r2 u{text-decoration:none;font-weight:700;font-variant-numeric:tabular-nums}
+  .r2 .a u{color:var(--ally)} .r2 .e u{color:var(--enemy)} .r2 .b u{color:var(--bot)}
+  .names{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+  .nm{
+    font-size:11.5px;padding:2px 7px;border-radius:6px;max-width:100%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .nm.a{color:var(--ally);background:rgba(95,227,192,.10);border:1px solid rgba(95,227,192,.28)}
+  .nm.e{color:var(--enemy);background:rgba(255,95,109,.10);border:1px solid rgba(255,95,109,.26)}
+  .badge{font-size:10.5px;padding:1px 6px;border-radius:5px;border:1px solid var(--line2);color:var(--dim2)}
+  .badge.not{border-color:rgba(255,200,74,.4);color:var(--gold)}
+  /* ---------- 表格视图 ---------- */
+  .tablewrap{display:none;padding:0 14px 40px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{position:sticky;top:0;background:#0c1319;color:var(--dim);font-weight:500;font-size:11.5px;z-index:2}
   th.sortable{cursor:pointer}
   td.num{text-align:right;font-variant-numeric:tabular-nums}
-  tbody tr:hover{background:#16212c}
-  tbody tr.clk{cursor:pointer}
-  .name{max-width:430px;white-space:normal;word-break:break-all}
-  .p{display:inline-block;padding:0 6px;margin:1px 3px 1px 0;border-radius:5px;font-size:11.5px;
-     border:1px solid rgba(255,255,255,.12)}
-  .p.a{color:var(--ally);border-color:rgba(124,228,205,.35)}
-  .p.e{color:var(--enemy);border-color:rgba(255,82,82,.3)}
-  .empty{padding:26px;text-align:center;color:var(--dim)}
-  .warnbox{margin:10px 16px 0;padding:9px 13px;border-radius:9px;
-           background:#2a2213;border:1px solid #4a3a18;color:var(--warn);font-size:12.5px}
-  .tag{font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--dim)}
+  tbody tr:hover{background:#131d27}
+  tbody tr{cursor:pointer}
+  body.tableview .list{display:none}
+  body.tableview .tablewrap{display:block}
+  /* ---------- 其他 ---------- */
+  .empty{padding:56px 20px;text-align:center;color:var(--dim2)}
+  .empty .big{font-size:30px;margin-bottom:10px;opacity:.5}
+  .skeleton{height:76px;border-radius:var(--r);background:linear-gradient(90deg,#111a23 25%,#16222e 50%,#111a23 75%);
+            background-size:200% 100%;animation:sk 1.3s infinite}
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .toast{
+    position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
+    background:var(--accent);color:#06231d;font-weight:700;font-size:13.5px;
+    padding:9px 18px;border-radius:999px;opacity:0;transition:.22s;z-index:60;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .warnbox{margin:0 14px 10px;padding:10px 13px;border-radius:var(--r2);
+           background:rgba(255,200,74,.09);border:1px solid rgba(255,200,74,.3);
+           color:var(--gold);font-size:12.5px}
 </style>
 </head>
 <body>
+
 <header>
-  <h1>DFM <span>· 管理员面板</span></h1>
-  <input id="q" placeholder="搜房间/玩家" autocomplete="off">
-  <label class="tag" style="border:none">范围
-    <select id="range">
-      <option value="all" selected>全部 1000~5999</option>
-      <option value="1">1 号 1000~1999</option>
-      <option value="2">2 号 2000~2999</option>
-      <option value="3">3 号 3000~3999</option>
-      <option value="4">4 号 4000~4999</option>
-      <option value="5">5 号 5000~5999</option>
-    </select>
-  </label>
-  <label class="tag" style="border:none">每节点并发
-    <select id="conc">
-      <option value="8">8（最稳）</option>
-      <option value="15" selected>15（推荐）</option>
-      <option value="25">25</option>
-      <option value="40">40（激进）</option>
-    </select>
-  </label>
-  <label class="tag" style="border:none">连接
-    <select id="mode">
-      <option value="direct">直连节点</option>
-      <option value="local">本地中继</option>
-      <option value="wss">公网 wss 中继</option>
-    </select>
-  </label>
-  <input id="wssurl" style="width:230px" placeholder="wss://imac-1.tailbdb43.ts.net/ws?room=" autocomplete="off">
-  <button id="scan">开始扫描</button>
-  <button id="stop" class="ghost" disabled>停止</button>
-  <label class="tag" style="border:none"><input type="checkbox" id="auto"> 自动刷新</label>
+  <div class="top">
+    <h1>DFM <i>· 管理面板</i></h1>
+    <div class="spacer"></div>
+    <button class="btn ghost" id="viewBtn" title="切换视图"><span class="ic">▤</span><span id="viewTxt">表格</span></button>
+    <button class="btn primary" id="reload"><span class="ic">⟳</span>刷新</button>
+  </div>
+  <div class="top" style="margin-top:9px">
+    <div class="searchwrap"><input id="q" placeholder="搜房间号 / 玩家名 / 地图" autocomplete="off"></div>
+    <label class="btn ghost" style="gap:6px"><input type="checkbox" id="auto" checked style="accent-color:var(--accent)"> 自动</label>
+  </div>
 </header>
 
-<div class="bar">
-  <div class="prog"><i id="pv"></i></div>
-  <span id="pct" style="color:var(--dim);font-size:12.5px;min-width:120px">未开始</span>
+<div class="stats">
+  <div class="st"><b id="cActive">–</b><span>有数据</span></div>
+  <div class="st"><b id="cNot">–</b><span>未进入</span></div>
+  <div class="st ally"><b id="cAlly">–</b><span>我方玩家</span></div>
+  <div class="st enemy"><b id="cEnemy">–</b><span>敌方玩家</span></div>
+  <div class="st val"><b id="cTotal">–</b><span>总价值</span></div>
+  <div class="st"><b id="cClosed">–</b><span>已关闭</span></div>
 </div>
 
-<div class="stats">
-  <span>有数据 <b id="cActive">0</b></span>
-  <span>未进入 <b id="cNot">0</b></span>
-  <span>已关闭 <b id="cClosed">0</b></span>
-  <span>失败 <b id="cFail">0</b></span>
-  <span>｜ 总在线 <b id="cPeers">0</b></span>
-  <span>我方玩家 <b id="cAlly">0</b></span>
-  <span>敌方玩家 <b id="cEnemy">0</b></span>
-  <span>｜ 总价值 <b id="cTotal">0</b></span>
-  <span>｜ 用时 <b id="cTime">0s</b></span>
+<div class="filters">
+  <button class="chip on" data-f="all">全部</button>
+  <button class="chip" data-f="players">有玩家</button>
+  <button class="chip" data-f="ally">我方≥1</button>
+  <button class="chip" data-f="enemy">有敌方</button>
+  <button class="chip" data-f="rich">价值≥50万</button>
+  <button class="chip" data-f="notentered">未进入</button>
+</div>
+
+<div class="srcbar">
+  <i class="dot" id="srcDot"></i>
+  <span id="src">加载中…</span>
+  <span id="cost"></span>
 </div>
 
 <div id="notice"></div>
+<div class="list" id="list">
+  <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+</div>
 
-<div class="wrap"><div class="scroll">
+<div class="tablewrap">
   <table>
     <thead><tr>
       <th class="sortable" data-k="room">房间</th>
@@ -116,218 +200,188 @@
       <th class="sortable num" data-k="nb">人机</th>
       <th>我方玩家</th>
       <th>敌方玩家</th>
-      <th class="sortable num" data-k="items">带价物品</th>
+      <th class="sortable num" data-k="items">带价</th>
       <th class="sortable num" data-k="total">总价值</th>
     </tr></thead>
-    <tbody id="rows"><tr><td colspan="11" class="empty">还没扫描。选范围，点「开始扫描」。</td></tr></tbody>
+    <tbody id="rows"></tbody>
   </table>
-</div></div>
+</div>
+
+<div class="toast" id="toast">已复制</div>
 
 <script>
 (function(){
   "use strict";
-  var NODES = {
-    1:["cheap-host1.cheapyun.com",12831], 2:["cheap-host1.cheapyun.com",17681],
-    3:["cheap-host1.cheapyun.com",48303], 4:["cheap-host1.cheapyun.com",13699],
-    5:["cheap-host1.cheapyun.com",41092]
-  };
-  var NODE_RANGES = [[1000,1999,1],[2000,2999,2],[3000,3999,3],[4000,4999,4],[5000,5999,5]];
-  var MAPS = {Brakkesh:"巴克什",SpaceCenter:"航天基地",ZeroDam:"零号大坝",Dam_Iris:"零号大坝",
-              Layali:"长弓溪谷",Forrest:"长弓溪谷","AZ-5":"核电站",Valley:"山谷",Tide:"潮汐监狱"};
-  var LOCAL = "ws://127.0.0.1:8898/ws?room=";
-
   var $=function(id){return document.getElementById(id);};
-  function fmt(v){ return (v||0).toLocaleString("en-US"); }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
-  function cn(m){ return MAPS[m]||m||"?"; }
+  function wan(v){
+    v=v||0;
+    if(v>=10000) return (v/10000).toFixed(v>=1000000?0:1).replace(/\.0$/,"")+"万";
+    return v.toLocaleString("en-US");
+  }
+  function full(v){ return (v||0).toLocaleString("en-US"); }
 
-  function mode(){ var e=$("mode"); return e?e.value:"direct"; }
-  function wsUrl(host, port, room){
-    var m = mode();
-    if(m==="local") return LOCAL + room;
-    if(m==="wss"){
-      var b = ($("wssurl")&&$("wssurl").value.trim()) || "wss://imac-1.tailbdb43.ts.net/ws?room=";
-      if(b.indexOf("room=")<0) b = b.replace(/\/+$/,"") + "/ws?room=";
-      return b + room;
-    }
-    return "ws://" + host + ":" + port + "/ws?room=" + room;
+  var rows=[], counts={}, filter="all", sortKey="total", sortAsc=false, timer=null, ok=false;
+
+  function load(){
+    fetch("./rooms.json?_="+Date.now(),{cache:"no-store"})
+      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+      .then(function(d){
+        rows=(d.active||[]).concat(d.notentered||[]);
+        counts=d.counts||{};
+        ok=true;
+        $("srcDot").className="dot";
+        $("src").textContent="服务端扫描 · "+(d.generated_at||"");
+        $("cost").textContent=d.cost_seconds?("· 耗时 "+d.cost_seconds+"s"):"";
+        $("notice").innerHTML="";
+        paint(); render();
+      })
+      .catch(function(e){
+        ok=false;
+        $("srcDot").className="dot off";
+        $("src").textContent="读不到 rooms.json（"+e.message+"）";
+        $("notice").innerHTML='<div class="warnbox">服务端扫描暂时不可用。'+
+          '确认服务器上的 <b>radar-scan</b> 服务在运行，或稍后重试。</div>';
+        if(!rows.length) $("list").innerHTML='<div class="empty"><div class="big">🛰️</div>暂无数据</div>';
+      });
   }
 
-  var scanning=false, rows=[], stat=null, t0=0, firstErr="";
-  function noteErr(m){ if(!firstErr) firstErr=m; }
-
-  function probe(n, nid, cb){
-    var room = String(n).padStart(4,"0");
-    var nt = NODES[nid], host = nt[0], port = nt[1];
-    var done=false, w=null;
-    var tm = setTimeout(function(){ finish({room:room,node:nid,status:"timeout"}); }, 5000);
-    function finish(res){
-      if(done) return; done=true; clearTimeout(tm);
-      if(w){ try{ w.onopen=w.onmessage=w.onerror=w.onclose=null; w.close(); }catch(e){} }
-      cb(res);
-    }
-    try{ w = new WebSocket(wsUrl(host, port, room)); }
-    catch(e){ noteErr("创建 WebSocket 失败："+e.name+" "+e.message); return finish({room:room,node:nid,status:"fail"}); }
-    w.onopen = function(){ try{ w.send(JSON.stringify({type:"hello",clientType:"web",room:room,clientName:"dfm-radar",version:2})); }catch(e){} };
-    w.onmessage = function(ev){
-      var d; try{ d = JSON.parse(ev.data); }catch(e){ return; }
-      if(d.type==="welcome"){
-        var ns=(d.state&&d.state.nativeState)||{}, mk=ns.markers||[];
-        var allies=mk.filter(function(m){return m.kind==="ally";});
-        var enemies=mk.filter(function(m){return m.kind==="player";});
-        var bots=mk.filter(function(m){return m.kind==="bot";});
-        var items=mk.filter(function(m){return m.kind==="item"&&m.price;});
-        finish({ room:room, node:nid,
-                 status: ns.available===false ? "notentered" : "active",
-                 map: MAPS[ns.levelName]||ns.levelName||"",
-                 peers: d.peers||0,
-                 na: allies.length, ne: enemies.length, nb: bots.length,
-                 an: allies.map(function(m){return m.label;}).slice(0,20),
-                 en: enemies.map(function(m){return m.label;}).slice(0,20),
-                 items: items.length,
-                 total: items.reduce(function(s,x){return s+(x.price||0);},0) });
-      } else if(d.type==="error"){
-        finish({room:room,node:nid,status:(d.code==="room-not-found"?"closed":"other"),code:d.code});
-      }
-    };
-    w.onerror = function(){ noteErr("连接被拒绝/中断（浏览器可能拦了 ws://）"); finish({room:room,node:nid,status:"fail"}); };
-    w.onclose = function(ev){ if(!done && ev && ev.code && ev.code!==1000) noteErr("连接关闭 code="+ev.code); finish({room:room,node:nid,status:"fail"}); };
-  }
-
-  var sortKey="total", sortAsc=false;
   function paint(){
-    var done=stat.done, total=stat.total;
-    var p = total ? (100*done/total) : 0;
-    $("pv").style.width = p.toFixed(1)+"%";
-    $("pct").textContent = done+"/"+total+"  ("+p.toFixed(0)+"%)";
-    $("cActive").textContent=stat.active; $("cNot").textContent=stat.notentered;
-    $("cClosed").textContent=stat.closed; $("cFail").textContent=stat.fail;
-    $("cPeers").textContent=stat.peers; $("cAlly").textContent=stat.ally;
-    $("cEnemy").textContent=stat.enemy; $("cTotal").textContent=fmt(stat.totalV);
-    $("cTime").textContent=((Date.now()-t0)/1000).toFixed(1)+"s";
+    var peers=0,ally=0,enemy=0,total=0;
+    rows.forEach(function(r){
+      if(r.status==="active"){ peers+=r.peers||0; ally+=r.na||0; enemy+=r.ne||0; total+=r.total||0; }
+    });
+    $("cActive").textContent=counts.active||0;
+    $("cNot").textContent=counts.notentered||0;
+    $("cAlly").textContent=ally;
+    $("cEnemy").textContent=enemy;
+    $("cTotal").textContent=wan(total);
+    $("cClosed").textContent=counts.closed||0;
   }
 
-  function shown(){
+  function visible(){
     var q=($("q").value||"").trim().toLowerCase();
-    var list=rows.filter(function(r){
+    return rows.filter(function(r){
+      if(filter==="players" && !((r.na||0)+(r.ne||0))) return false;
+      if(filter==="ally" && !(r.na>0)) return false;
+      if(filter==="enemy" && !(r.ne>0)) return false;
+      if(filter==="rich" && !((r.total||0)>=500000)) return false;
+      if(filter==="notentered" && r.status!=="notentered") return false;
       if(!q) return true;
-      if(r.room.indexOf(q)>=0) return true;
+      if(String(r.room).indexOf(q)>=0) return true;
       if((r.map||"").toLowerCase().indexOf(q)>=0) return true;
-      return (r.an||[]).concat(r.en||[]).some(function(n){ return String(n).toLowerCase().indexOf(q)>=0; });
-    });
-    list.sort(function(a,b){
+      return (r.an||[]).concat(r.en||[]).some(function(n){
+        return String(n).toLowerCase().indexOf(q)>=0; });
+    }).sort(function(a,b){
       var x=a[sortKey], y=b[sortKey];
       if(sortKey==="room"){ x=+x; y=+y; }
-      if(typeof x==="string"){ return sortAsc? (x>y?1:-1) : (x<y?1:-1); }
-      return sortAsc ? (x-y) : (y-x);
+      if(typeof x==="string"){ return sortAsc?(x>y?1:-1):(x<y?1:-1); }
+      return sortAsc?((x||0)-(y||0)):((y||0)-(x||0));
     });
-    return list;
   }
 
-  function renderRows(){
-    var list=shown(), tb=$("rows");
-    if(!list.length){ tb.innerHTML='<tr><td colspan="11" class="empty">没有匹配的房间。</td></tr>'; return; }
-    tb.innerHTML = list.slice(0,600).map(function(r){
-      var not = r.status==="notentered";
-      var an=(r.an||[]).map(function(n){return '<span class="p a">'+esc(n)+'</span>';}).join("");
-      var en=(r.en||[]).map(function(n){return '<span class="p e">'+esc(n)+'</span>';}).join("");
-      return '<tr class="clk" data-room="'+r.room+'">'+
-        '<td><b>'+r.room+'</b>'+(not?' <span class="tag">未进入</span>':'')+'</td>'+
-        '<td>'+r.node+'</td><td>'+(not?'—':esc(cn(r.map)))+'</td>'+
-        '<td class="num">'+r.peers+'</td>'+
+  function render(){
+    var list=visible();
+    /* 卡片 */
+    var L=$("list");
+    if(!list.length){
+      L.innerHTML='<div class="empty"><div class="big">🔎</div>没有匹配的房间</div>';
+    } else {
+      L.innerHTML=list.slice(0,500).map(function(r){
+        var not=r.status==="notentered";
+        var hot=(r.total||0)>=500000;
+        var names="";
+        (r.an||[]).slice(0,8).forEach(function(n){ names+='<span class="nm a">'+esc(n)+'</span>'; });
+        (r.en||[]).slice(0,8).forEach(function(n){ names+='<span class="nm e">'+esc(n)+'</span>'; });
+        return '<div class="room'+(hot?" hot":"")+(not?" idle":"")+'" data-room="'+r.room+'">'+
+          '<div class="r1">'+
+            '<span class="rno">'+r.room+'</span>'+
+            '<span class="node">'+r.node+'号</span>'+
+            '<span class="map">'+(not?'<span class="badge not">未进入</span>':esc(r.map||"?"))+'</span>'+
+            '<span class="val'+(r.total?"":" zero")+'">'+wan(r.total)+'</span>'+
+          '</div>'+
+          '<div class="r2">'+
+            '<span>在线 <u>'+(r.peers||0)+'</u></span>'+
+            '<span class="a">我方 <u>'+(r.na||0)+'</u></span>'+
+            '<span class="e">敌方 <u>'+(r.ne||0)+'</u></span>'+
+            '<span class="b">人机 <u>'+(r.nb||0)+'</u></span>'+
+            '<span>带价 <u>'+(r.items||0)+'</u></span>'+
+          '</div>'+
+          (names?'<div class="names">'+names+'</div>':'')+
+        '</div>';
+      }).join("");
+    }
+    /* 表格 */
+    var tb=$("rows");
+    tb.innerHTML=list.slice(0,600).map(function(r){
+      var not=r.status==="notentered";
+      var an=(r.an||[]).map(function(n){return '<span class="nm a">'+esc(n)+'</span>';}).join(" ");
+      var en=(r.en||[]).map(function(n){return '<span class="nm e">'+esc(n)+'</span>';}).join(" ");
+      return '<tr data-room="'+r.room+'">'+
+        '<td><b>'+r.room+'</b></td><td>'+r.node+'</td>'+
+        '<td>'+(not?"未进入":esc(r.map||"?"))+'</td>'+
+        '<td class="num">'+(r.peers||0)+'</td>'+
         '<td class="num" style="color:var(--ally)">'+(r.na||0)+'</td>'+
         '<td class="num" style="color:var(--enemy)">'+(r.ne||0)+'</td>'+
         '<td class="num">'+(r.nb||0)+'</td>'+
-        '<td class="name">'+(an||'<span style="color:var(--dim)">—</span>')+'</td>'+
-        '<td class="name">'+(en||'<span style="color:var(--dim)">—</span>')+'</td>'+
-        '<td class="num">'+r.items+'</td>'+
-        '<td class="num"><b>'+fmt(r.total)+'</b></td></tr>';
+        '<td>'+an+'</td><td>'+en+'</td>'+
+        '<td class="num">'+(r.items||0)+'</td>'+
+        '<td class="num" style="color:var(--gold)"><b>'+full(r.total)+'</b></td></tr>';
     }).join("");
   }
 
-  function bump(r){
-    stat.done++;
-    if(r){
-      if(r.status==="active"){
-        stat.active++; rows.push(r);
-        stat.peers+=r.peers; stat.ally+=(r.na||0); stat.enemy+=(r.ne||0); stat.totalV+=r.total;
-      } else if(r.status==="notentered"){ stat.notentered++; rows.push(r); }
-      else if(r.status==="closed") stat.closed++;
-      else { stat.fail++; if(r.code) noteErr("服务端错误码："+r.code); }
-    } else stat.fail++;
-    if(stat.done % 20 === 0 || stat.done === stat.total){ paint(); renderRows(); }
+  function toast(msg){
+    var t=$("toast"); t.textContent=msg||"已复制房间号"; t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1100);
   }
 
-  async function worker(nid, lo, hi, conc){
-    var next=lo;
-    async function one(){
-      while(scanning && next<=hi){
-        var n=next++;
-        await new Promise(function(res){ probe(n, nid, function(r){ bump(r); res(); }); });
-      }
-    }
-    var arr=[]; for(var i=0;i<conc;i++) arr.push(one());
-    await Promise.all(arr);
-  }
-
-  function startScan(){
-    if(scanning) return;
-    var sel=$("range").value;
-    var ranges = (sel==="all") ? NODE_RANGES.map(function(r){return r.slice();}) : [NODE_RANGES[+sel-1].slice()];
-    var conc=parseInt($("conc").value,10);
-    var total=ranges.reduce(function(s,r){ return s+(r[1]-r[0]+1); },0);
-
-    scanning=true; rows=[]; t0=Date.now(); firstErr="";
-    stat={done:0,total:total,active:0,notentered:0,closed:0,fail:0,peers:0,ally:0,enemy:0,totalV:0};
-    $("scan").disabled=true; $("stop").disabled=false;
-    $("range").disabled=true; $("conc").disabled=true; $("mode").disabled=true;
-    $("notice").innerHTML="";
-    paint(); renderRows();
-
-    Promise.all(ranges.map(function(r){ return worker(r[2], r[0], r[1], conc); })).then(function(){
-      scanning=false;
-      $("scan").disabled=false; $("stop").disabled=true;
-      $("range").disabled=false; $("conc").disabled=false; $("mode").disabled=false;
-      paint(); renderRows();
-      if(stat.fail>0){
-        $("notice").innerHTML='<div class="warnbox">本次有 <b>'+stat.fail+'</b> 个房间失败。'+
-          (firstErr?('首个原因：<code>'+esc(firstErr)+'</code>'):'')+
-          '　<i>失败偏多通常是并发过高被服务端限流，把「每节点并发」调低再扫。</i></div>';
-      }
-      if($("auto").checked && !scanning) setTimeout(function(){ if($("auto").checked) startScan(); }, 60000);
+  /* 事件 */
+  $("reload").addEventListener("click", function(){ load(); toast("已刷新"); });
+  $("q").addEventListener("input", render);
+  $("viewBtn").addEventListener("click", function(){
+    document.body.classList.toggle("tableview");
+    var t=document.body.classList.contains("tableview");
+    $("viewTxt").textContent = t ? "卡片" : "表格";
+    render();
+  });
+  document.querySelectorAll(".chip").forEach(function(c){
+    c.addEventListener("click", function(){
+      document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});
+      c.classList.add("on");
+      filter=c.getAttribute("data-f");
+      render();
     });
-  }
-
-  $("scan").addEventListener("click", startScan);
-  $("stop").addEventListener("click", function(){ scanning=false; $("stop").disabled=true; $("pct").textContent+=" · 已停止"; });
-  $("q").addEventListener("input", renderRows);
+  });
   document.querySelectorAll("th.sortable").forEach(function(th){
     th.addEventListener("click", function(){
       var k=th.getAttribute("data-k");
       if(sortKey===k) sortAsc=!sortAsc; else { sortKey=k; sortAsc=false; }
-      renderRows();
+      render();
     });
+  });
+  function copyRoom(el){
+    var room=el.getAttribute("data-room");
+    try{ navigator.clipboard.writeText(room); }catch(_){
+      try{ var ta=document.createElement("textarea"); ta.value=room;
+        document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+        document.body.removeChild(ta); }catch(__){}
+    }
+    toast("房间号 "+room+" 已复制");
+  }
+  $("list").addEventListener("click", function(e){
+    var el=e.target.closest(".room"); if(el) copyRoom(el);
   });
   $("rows").addEventListener("click", function(e){
-    var tr=e.target.closest("tr[data-room]"); if(!tr) return;
-    var room=tr.getAttribute("data-room");
-    // 复制房间号（官方页面的房间号输入框没法从外部直接驱动，复制最稳）
-    try{ navigator.clipboard.writeText(room); }catch(_){}
-    var old=tr.querySelector("td").innerHTML;
-    tr.querySelector("td").innerHTML='<b>'+room+'</b> 已复制';
-    setTimeout(function(){ tr.querySelector("td").innerHTML=old; }, 900);
+    var el=e.target.closest("tr[data-room]"); if(el) copyRoom(el);
   });
 
-  if(location.protocol==="https:"){ $("mode").value="wss"; }
-  try{
-    ["mode","wssurl"].forEach(function(id){
-      var e=$(id); if(!e) return;
-      var v=localStorage.getItem("dfm_admin_"+id); if(v) e.value=v;
-      e.addEventListener("change", function(){ try{localStorage.setItem("dfm_admin_"+id, e.value);}catch(_){} });
-      e.addEventListener("input",  function(){ try{localStorage.setItem("dfm_admin_"+id, e.value);}catch(_){} });
-    });
-  }catch(e){}
+  function tick(){
+    if($("auto").checked) load();
+    timer=setTimeout(tick, 20000);
+  }
+  load();
+  timer=setTimeout(tick, 20000);
 })();
 </script>
 </body>
