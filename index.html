@@ -109,7 +109,7 @@
       <option value="wss">公网 wss 中继</option>
     </select>
   </label>
-  <input id="wssurl" style="width:250px" placeholder="wss://ws.enenh.com/ws?room=" autocomplete="off">
+  <input id="wssurl" style="width:290px" placeholder="wss://imac-1.tailbdb43.ts.net/ws?room=" autocomplete="off">
   <button id="scan">开始扫描</button>
   <button id="scanStop" class="ghost" disabled>停止</button>
   <div class="prog"><i id="bar"></i></div>
@@ -181,7 +181,7 @@
     var m = mode();
     if(m === "local") return LOCAL + room;
     if(m === "wss"){
-      var b = ($("wssurl") && $("wssurl").value.trim()) || "wss://ws.enenh.com/ws?room=";
+      var b = ($("wssurl") && $("wssurl").value.trim()) || "wss://imac-1.tailbdb43.ts.net/ws?room=";
       if(b.indexOf("room=") < 0) b = b.replace(/\/+$/, "") + "/ws?room=";
       return b + room;
     }
