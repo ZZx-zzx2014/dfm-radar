@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DFM · 玩家价值面板</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121a23; --panel2:#0f161e; --line:#1f2b38;
+    --fg:#e6edf3; --dim:#8b9bb0; --accent:#35c2a5; --warn:#ffb020;
+    --ally:#7ce4cd; --enemy:#ff5252; --item:#ffd040;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+         padding:13px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+  h1{font-size:15px;margin:0 12px 0 0;letter-spacing:2px;font-weight:600;white-space:nowrap}
+  h1 span{color:var(--accent)}
+  input,select,button{font:inherit;color:var(--fg);background:var(--panel2);
+                      border:1px solid var(--line);border-radius:8px;padding:7px 10px;outline:none}
+  input#room{width:104px;letter-spacing:3px;text-align:center;font-size:16px}
+  button{cursor:pointer;background:var(--accent);color:#06231d;border:none;font-weight:600}
+  button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);font-weight:400}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .status{display:flex;flex-wrap:wrap;gap:8px 22px;padding:10px 18px;
+          background:var(--panel2);border-bottom:1px solid var(--line);font-size:13px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;margin-right:6px}
+  .dot.on{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  .dot.bad{background:var(--enemy)}
+  .wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 18px}
+  @media(max-width:860px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .card h2{margin:0;padding:11px 14px;font-size:14px;font-weight:600;
+           background:var(--panel2);border-bottom:1px solid var(--line);
+           display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .card h2 em{font-style:normal;color:var(--dim);font-weight:400;font-size:12px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}
+  th{color:var(--dim);font-weight:500;font-size:12px;white-space:nowrap}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr.clickable{cursor:pointer}
+  tbody tr.clickable:hover{background:#16212c}
+  .chip{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:1px}
+  .tag{font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--dim)}
+  .empty{padding:24px 16px;text-align:center;color:var(--dim)}
+  .big{font-size:22px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .note{padding:12px 18px;color:var(--dim);font-size:12px;border-top:1px solid var(--line)}
+  .warnbox{margin:12px 18px 0;padding:10px 14px;border-radius:10px;
+           background:#2a2213;border:1px solid #4a3a18;color:var(--warn);font-size:13px}
+  .scanbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 18px;
+           background:var(--panel);border-bottom:1px solid var(--line)}
+  .prog{height:7px;border-radius:4px;background:var(--line);overflow:hidden;flex:1 1 180px;min-width:150px}
+  .prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+  .scanstat{display:flex;flex-wrap:wrap;gap:6px 18px;padding:9px 18px;font-size:12.5px;color:var(--dim);
+            background:var(--panel2);border-bottom:1px solid var(--line)}
+  .scanstat b{color:var(--fg)}
+  .scroll{max-height:460px;overflow:auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>DFM <span>· 玩家价值面板</span></h1>
+  <input id="room" maxlength="4" inputmode="numeric" placeholder="房间号" autocomplete="off">
+  <button id="go">连接</button>
+  <button id="stop" class="ghost" disabled>断开</button>
+  <label class="tag" style="border:none">归属半径
+    <select id="radius">
+      <option value="1000">10 米</option>
+      <option value="3000" selected>30 米</option>
+      <option value="6000">60 米</option>
+      <option value="0">不限</option>
+    </select>
+  </label>
+</header>
+
+<div class="status">
+  <span><i id="dot" class="dot"></i><b id="st">未连接</b></span>
+  <span>节点 <b id="node">—</b></span>
+  <span>地图 <b id="map">—</b></span>
+  <span>在线 <b id="peers">—</b></span>
+  <span>标记 <b id="mk">—</b></span>
+  <span>更新 <b id="upd">—</b></span>
+</div>
+
+<div class="scanbar">
+  <label class="tag" style="border:none">扫描范围
+    <select id="range">
+      <option value="all" selected>全部 1000~5999（5 段并行）</option>
+      <option value="1">1 号 1000~1999</option>
+      <option value="2">2 号 2000~2999</option>
+      <option value="3">3 号 3000~3999</option>
+      <option value="4">4 号 4000~4999</option>
+      <option value="5">5 号 5000~5999</option>
+    </select>
+  </label>
+  <label class="tag" style="border:none">每节点并发
+    <select id="conc">
+      <option value="10">10（最稳）</option>
+      <option value="20">20</option>
+      <option value="30" selected>30（推荐）</option>
+      <option value="50">50（激进）</option>
+    </select>
+  </label>
+  <label class="tag" style="border:none"><input type="checkbox" id="useproxy" style="width:auto;vertical-align:-1px"> 本地代理</label>
+  <button id="scan">开始扫描</button>
+  <button id="scanStop" class="ghost" disabled>停止</button>
+  <div class="prog"><i id="bar"></i></div>
+  <span id="pct" style="color:var(--dim);font-size:12.5px;min-width:110px">未开始</span>
+</div>
+
+<div class="scanstat">
+  <span>已扫 <b id="sDone">0</b>/<b id="sTotal">0</b></span>
+  <span>有数据 <b id="sActive">0</b></span>
+  <span>未进入 <b id="sNot">0</b></span>
+  <span>已关闭 <b id="sClosed">0</b></span>
+  <span>失败 <b id="sFail">0</b></span>
+  <span>用时 <b id="sTime">0s</b></span>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <h2>玩家价值 <em id="pv-sub">按坐标邻近推断</em></h2>
+    <table>
+      <thead><tr><th>玩家</th><th class="num">邻近物资</th><th class="num">推断价值</th></tr></thead>
+      <tbody id="players"><tr><td colspan="3" class="empty">等待连接…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>带价物资 <em id="it-sub">—</em></h2>
+    <table>
+      <thead><tr><th>物品</th><th class="num">单价</th></tr></thead>
+      <tbody id="items"><tr><td colspan="2" class="empty">等待连接…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="status" style="border-bottom:none">
+  <span>房间总价值 <b class="big" id="total">0</b></span>
+  <span>带价物资 <b id="icount">0</b> 件</span>
+  <span>友方 <b id="nally">0</b> ｜ 敌方 <b id="nenemy">0</b> ｜ 人机 <b id="nbot">0</b></span>
+</div>
+
+<div id="warn"></div>
+
+<div class="card" style="margin:16px 18px 0">
+  <h2>扫描结果 <em id="res-sub">点任意一行可看该房间实时详情</em></h2>
+  <div class="scroll">
+    <table>
+      <thead><tr>
+        <th>房间</th><th>节点</th><th>地图</th><th class="num">人数</th>
+        <th class="num">玩家</th><th class="num">带价物品</th><th class="num">总价值</th>
+      </tr></thead>
+      <tbody id="results"><tr><td colspan="7" class="empty">还没扫描。选个范围，点「开始扫描」。</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="note">
+  <b>说明</b>：数值来自雷达服务端下发的 <code>nativeState.markers</code>。只有带 <code>price</code> 的物资才有价格，
+  服务端并非每场都给全部物资标价，所以「总价值」是<b>已知价格之和</b>，可能偏低。<br>
+  「玩家价值」是把每件带价物资归给<b>距离最近的玩家</b>（半径可调）后求和 —— 属<b>推断值</b>，不是客户端上报的真实归属。<br>
+  扫描按房间号直连对应节点（实测：<code>节点号 = 房间号 ÷ 1000</code> 取整，即 1号 1000-1999 / 2号 2000-2999 / 3号 3000-3999 / 4号 4000-4999 / 5号 5000-5999；6000 无人接管）。
+  全段扫描会对服务端发起约 5000 次连接，请适量使用。
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PROXY = "ws://127.0.0.1:8898/ws?room=";
+  function useProxy(){ var e=$("useproxy"); return !!(e && e.checked); }
+  function wsUrl(host, port, room){
+    return useProxy() ? (PROXY + room) : ("ws://" + host + ":" + port + "/ws?room=" + room);
+  }
+
+  var NODES = {
+    1:["cheap-host1.cheapyun.com",12831],
+    2:["cheap-host1.cheapyun.com",17681],
+    3:["cheap-host1.cheapyun.com",48303],
+    4:["cheap-host1.cheapyun.com",13699],
+    5:["cheap-host1.cheapyun.com",41092]
+  };
+  // 实测修正：整千的房间归「下一个」节点（2000→2号、3000→3号…），6000 无人管
+  var NODE_RANGES = [[1000,1999,1],[2000,2999,2],[3000,3999,3],[4000,4999,4],[5000,5999,5]];
+  var MAPS = {Brakkesh:"巴克什",SpaceCenter:"航天基地",ZeroDam:"零号大坝",Dam_Iris:"零号大坝",
+              Layali:"长弓溪谷",Valley:"山谷",Tide:"潮汐监狱"};
+
+  var $ = function(id){ return document.getElementById(id); };
+  function fmt(v){ return (v||0).toLocaleString("en-US"); }
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function cn(map){ return MAPS[map] || map || ""; }
+  function pad4(n){ var s=String(n); return s.length<4 ? ("0000"+s).slice(-4) : s; }
+
+  /* ================= 实时看板 ================= */
+  var ws=null, room="", hb=null, lastMsg=0, attempt=0, timer=null, closedByUser=false, lastPeers=null;
+
+  function nodeForRoom(n){ return (n>=1000 && n<=5999) ? Math.floor(n/1000) : null; }
+  function setStatus(text, cls){ $("st").textContent=text; $("dot").className="dot"+(cls?" "+cls:""); }
+  function warn(html){ $("warn").innerHTML = html ? '<div class="warnbox">'+html+'</div>' : ""; }
+
+  function connect(){
+    var v=$("room").value.trim();
+    if(!/^[0-9]{4}$/.test(v)){ warn("请输入 4 位数字房间号。"); return; }
+    var nid=nodeForRoom(parseInt(v,10));
+    if(!nid){ warn("房间号 "+v+" 不在已知区间（1000~6000）内。"); return; }
+    warn(""); closedByUser=false; stop(true); room=v; attempt=0;
+    try{ localStorage.setItem("dfm_last_room", room); }catch(e){}
+    openSocket(nid);
+  }
+  function openSocket(nid){
+    var host=NODES[nid][0], port=NODES[nid][1];
+    $("node").textContent = nid+" 号 ("+host+":"+port+")";
+    setStatus(attempt?("重连中 #"+attempt):"连接中…","");
+    $("go").disabled=true; $("stop").disabled=false;
+    try{ ws=new WebSocket(wsUrl(host, port, room)); }
+    catch(e){ setStatus("连接失败","bad"); scheduleRetry(); return; }
+
+    ws.onopen=function(){
+      attempt=0; lastMsg=Date.now();
+      ws.send(JSON.stringify({type:"hello",clientType:"web",room:room,clientName:"dfm-radar",version:2}));
+      setStatus("已连接","on");
+      if(hb) clearInterval(hb);
+      hb=setInterval(function(){
+        if(!ws||ws.readyState!==1) return;
+        if(Date.now()-lastMsg>35000){ hardRecover(); return; }
+        try{ ws.send(JSON.stringify({type:"heartbeat"})); }catch(e){}
+      },12000);
+    };
+    ws.onmessage=function(ev){
+      lastMsg=Date.now();
+      var d; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+      if(d.type==="error"){
+        if(d.code==="room-not-found"){ setStatus("房间不存在","bad");
+          warn("服务端返回 <code>room-not-found</code> —— 确认客户端房间号，且已开启共享。"); }
+        else if(d.code==="wrong-node"){ setStatus("节点不匹配","bad");
+          warn("服务端返回 <code>wrong-node</code>，说明区间表要修正。"); }
+        else setStatus("服务端错误","bad");
+        stop(true); return;
+      }
+      if(d.type==="welcome"){ if(String(d.room)!==room) return; render(d); return; }
+      if(d.type==="native-state"){ render({type:"welcome",room:room,peers:lastPeers,state:d.state}); return; }
+      if(d.type==="snapshot"){
+        render({type:"welcome",room:room,peers:lastPeers,
+                state:{nativeState:(d.state&&d.state.nativeState)||d.state}}); return;
+      }
+    };
+    ws.onclose=function(){ if(closedByUser) return; setStatus("已断开","bad"); scheduleRetry(); };
+    ws.onerror=function(){ if(!closedByUser) setStatus("连接错误","bad"); };
+  }
+  function scheduleRetry(){
+    if(closedByUser) return;
+    attempt++;
+    if(attempt>5){ setStatus("放弃重连（已试 "+(attempt-1)+" 次）","bad"); $("go").disabled=false; return; }
+    if(timer) clearTimeout(timer);
+    timer=setTimeout(function(){ var nid=nodeForRoom(parseInt(room,10)); if(nid) openSocket(nid); },
+                     Math.min(1500*attempt,6000));
+  }
+  function hardRecover(){
+    try{ ws.close(); }catch(e){}
+    attempt++;
+    var nid=nodeForRoom(parseInt(room,10));
+    if(nid && attempt<=5) setTimeout(function(){ openSocket(nid); },800);
+  }
+  function stop(silent){
+    closedByUser=true;
+    if(hb){ clearInterval(hb); hb=null; }
+    if(timer){ clearTimeout(timer); timer=null; }
+    if(ws){ try{ ws.onclose=null; ws.close(); }catch(e){} ws=null; }
+    $("go").disabled=false; $("stop").disabled=true;
+    if(!silent) setStatus("未连接","");
+  }
+
+  function render(d){
+    var ns=(d.state&&d.state.nativeState)||{};
+    if(typeof d.peers==="number" && d.peers>=0) lastPeers=d.peers;
+    $("map").textContent=cn(ns.levelName)||"—";
+    $("peers").textContent=(lastPeers==null?"—":lastPeers);
+    $("upd").textContent=new Date().toLocaleTimeString("zh-CN");
+    var mk=ns.markers||[];
+    $("mk").textContent=mk.length;
+
+    if(ns.available===false){
+      warn("房间已建、玩家尚未进场（服务端 <code>available:false</code>）—— 暂无地图与位置数据。");
+    } else warn("");
+
+    var players=mk.filter(function(m){ return m.kind==="ally"||m.kind==="player"; });
+    var bots=mk.filter(function(m){ return m.kind==="bot"; });
+    var items=mk.filter(function(m){ return m.kind==="item"&&m.price; })
+                .sort(function(a,b){ return b.price-a.price; });
+
+    var radius=parseInt($("radius").value,10);
+    function d2(a,b){ var dx=a.x-b.x, dy=a.y-b.y, dz=(a.z||0)-(b.z||0); return dx*dx+dy*dy+dz*dz; }
+    var bucket={};
+    players.forEach(function(p){ bucket[p.id]={p:p,sum:0,n:0}; });
+    items.forEach(function(it){
+      var best=null,bd=Infinity;
+      players.forEach(function(p){ var dd=d2(p,it); if(dd<bd){ bd=dd; best=p; } });
+      if(!best) return;
+      if(radius>0 && Math.sqrt(bd)>radius) return;
+      var b=bucket[best.id]; if(b){ b.sum+=it.price; b.n++; }
+    });
+    var rows=Object.keys(bucket).map(function(k){ return bucket[k]; })
+                    .sort(function(a,b){ return b.sum-a.sum; });
+
+    $("pv-sub").textContent="按坐标邻近推断"+(radius>0?("（半径 "+(radius/100)+" 米）"):"（全归最近）");
+    var pb=$("players");
+    if(!rows.length){
+      pb.innerHTML='<tr><td colspan="3" class="empty">'+(players.length?"暂无带价物资可归属":"暂无玩家")+'</td></tr>';
+    }else{
+      var maxv=rows[0].sum||1;
+      pb.innerHTML=rows.map(function(r){
+        var p=r.p, color=(p.kind==="ally")?"var(--ally)":"var(--enemy)";
+        return '<tr><td><span class="chip" style="background:'+color+'"></span>'+esc(p.label)+
+               ' <span class="tag">'+(p.kind==="ally"?"友":"敌")+'</span>'+
+               '<div class="bar"><i style="width:'+Math.round(100*r.sum/maxv)+'%;display:block;height:100%;background:'+color+'"></i></div></td>'+
+               '<td class="num">'+r.n+'</td><td class="num"><b style="color:'+color+'">'+fmt(r.sum)+'</b></td></tr>';
+      }).join("");
+    }
+    var total=items.reduce(function(s,x){ return s+x.price; },0);
+    $("total").textContent=fmt(total);
+    $("icount").textContent=items.length;
+    $("it-sub").textContent=items.length+" 件";
+    $("nally").textContent=players.filter(function(m){ return m.kind==="ally"; }).length;
+    $("nenemy").textContent=players.filter(function(m){ return m.kind==="player"; }).length;
+    $("nbot").textContent=bots.length;
+    $("items").innerHTML = items.length
+      ? items.slice(0,60).map(function(x){ return '<tr><td>'+esc(x.label)+'</td><td class="num">'+fmt(x.price)+'</td></tr>'; }).join("")
+      : '<tr><td colspan="2" class="empty">暂无带价物资</td></tr>';
+  }
+
+  /* ================= 自动扫描 ================= */
+  var scanning=false, stat=null, rows=[], t0=0, firstErr="";
+  function noteErr(m){ if(!firstErr) firstErr=m; }
+
+  function probeRoom(n, nid, cb){
+    var r=pad4(n), host=NODES[nid][0], port=NODES[nid][1];
+    var done=false, w=null;
+    var timer=setTimeout(function(){ finish({room:r,node:nid,status:"timeout"}); },5000);
+    function finish(res){
+      if(done) return; done=true; clearTimeout(timer);
+      if(w){ try{ w.onopen=w.onmessage=w.onerror=w.onclose=null; w.close(); }catch(e){} }
+      cb(res);
+    }
+    try{ w=new WebSocket(wsUrl(host, port, r)); }
+    catch(e){ noteErr("创建 WebSocket 失败："+e.name+" "+e.message); return finish({room:r,node:nid,status:"fail"}); }
+    w.onopen=function(){ try{ w.send(JSON.stringify({type:"hello",clientType:"web",room:r,clientName:"dfm-radar",version:2})); }catch(e){} };
+    w.onmessage=function(ev){
+      var d; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+      if(d.type==="welcome"){
+        var ns=(d.state&&d.state.nativeState)||{}, mk=ns.markers||[];
+        var items=mk.filter(function(m){ return m.kind==="item"&&m.price; });
+        var pl=mk.filter(function(m){ return m.kind==="ally"||m.kind==="player"; });
+        finish({ room:r, node:nid,
+                 status: (ns.available===false ? "notentered" : "active"),
+                 map: ns.levelName||"", peers:d.peers||0,
+                 players: pl.length, items: items.length,
+                 total: items.reduce(function(s,x){ return s+(x.price||0); },0) });
+      }else if(d.type==="error"){
+        finish({ room:r, node:nid, status:(d.code==="room-not-found"?"closed":"other"), code:d.code });
+      }
+    };
+    w.onerror=function(){ noteErr("连接被拒绝/中断（浏览器可能拦截了 ws://）"); finish({room:r,node:nid,status:"fail"}); };
+    w.onclose=function(ev){ if(!done && ev && ev.code && ev.code!==1000) noteErr("连接关闭 code="+ev.code); finish({room:r,node:nid,status:"fail"}); };
+  }
+
+  function bump(row){
+    stat.done++;
+    if(row){
+      if(row.status==="active"){ stat.active++; rows.push(row); }
+      else if(row.status==="notentered"){ stat.notentered++; rows.push(row); }
+      else if(row.status==="closed") stat.closed++;
+      else { stat.fail++; if(row.code) noteErr("服务端错误码："+row.code); }
+    } else stat.fail++;
+    if(stat.done % 15 === 0 || stat.done === stat.total) paint();
+  }
+  function paint(){
+    var p = stat.total ? (100*stat.done/stat.total) : 0;
+    $("bar").style.width = p.toFixed(1)+"%";
+    $("pct").textContent = stat.done+"/"+stat.total+"  ("+p.toFixed(0)+"%)";
+    $("sDone").textContent=stat.done; $("sTotal").textContent=stat.total;
+    $("sActive").textContent=stat.active; $("sNot").textContent=stat.notentered;
+    $("sClosed").textContent=stat.closed; $("sFail").textContent=stat.fail;
+    $("sTime").textContent=((Date.now()-t0)/1000).toFixed(1)+"s";
+  }
+  function paintResults(){
+    var list=rows.slice().sort(function(a,b){ return b.total-a.total; });
+    $("res-sub").textContent = list.length+" 个房间（按价值排序）· 点行看详情";
+    var tb=$("results");
+    if(!list.length){ tb.innerHTML='<tr><td colspan="7" class="empty">这轮没扫到房间。</td></tr>'; return; }
+    tb.innerHTML=list.slice(0,400).map(function(r,i){
+      var isNot = r.status==="notentered";
+      return '<tr class="clickable" data-room="'+r.room+'">'+
+        '<td><b>'+r.room+'</b>'+(isNot?' <span class="tag">未进入</span>':'')+'</td>'+
+        '<td>'+r.node+'</td>'+
+        '<td>'+(isNot?'—':(esc(cn(r.map))||'—'))+'</td>'+
+        '<td class="num">'+r.peers+'</td>'+
+        '<td class="num">'+r.players+'</td>'+
+        '<td class="num">'+r.items+'</td>'+
+        '<td class="num"><b>'+fmt(r.total)+'</b></td></tr>';
+    }).join("");
+  }
+
+  async function worker(nid, lo, hi, conc){
+    var next=lo;
+    async function one(){
+      while(scanning && next<=hi){
+        var n=next++;
+        await new Promise(function(res){ probeRoom(n,nid,function(row){ bump(row); res(); }); });
+      }
+    }
+    var arr=[]; for(var i=0;i<conc;i++) arr.push(one());
+    await Promise.all(arr);
+  }
+
+  function startScan(){
+    if(scanning) return;
+    var sel=$("range").value;
+    var ranges = (sel==="all")
+      ? NODE_RANGES.map(function(r){ return [r[0],r[1],r[2]]; })
+      : [ NODE_RANGES[parseInt(sel,10)-1].slice() ];
+    var conc=parseInt($("conc").value,10);
+    var total=ranges.reduce(function(s,r){ return s+(r[1]-r[0]+1); },0);
+
+    scanning=true; rows=[]; t0=Date.now(); firstErr="";
+    $("sFail").textContent="0"; warn("");
+    stat={done:0,total:total,active:0,notentered:0,closed:0,fail:0};
+    $("scan").disabled=true; $("scanStop").disabled=false;
+    $("range").disabled=true; $("conc").disabled=true;
+    $("results").innerHTML='<tr><td colspan="7" class="empty">扫描中…</td></tr>';
+    paint();
+
+    Promise.all(ranges.map(function(r){ return worker(r[2], r[0], r[1], conc); })).then(function(){
+      scanning=false;
+      $("scan").disabled=false; $("scanStop").disabled=true;
+      $("range").disabled=false; $("conc").disabled=false;
+      paint(); paintResults();
+      if(stat.fail>0){
+        var hint = "";
+        if(location.protocol==="https:"){
+          hint = "<br>⚠️ 页面是 <b>https</b> 打开的，浏览器会拦截 <code>ws://</code>（混合内容）。"+
+                 "请把文件保存到电脑，用 <b>Finder 双击</b>打开（地址栏应为 <code>file://</code>）。";
+        }
+        warn("本次有 <b>"+stat.fail+"</b> 个房间失败。"+(firstErr?("首个原因：<code>"+esc(firstErr)+"</code>"):"")+hint);
+      }else{
+        warn("");
+      }
+    });
+  }
+
+  $("scan").addEventListener("click", startScan);
+  $("scanStop").addEventListener("click", function(){
+    scanning=false;
+    $("scanStop").disabled=true;
+    $("pct").textContent+=" · 已停止";
+  });
+  $("results").addEventListener("click", function(e){
+    var tr=e.target.closest("tr[data-room]");
+    if(!tr) return;
+    $("room").value=tr.getAttribute("data-room");
+    connect();
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  /* ================= 绑定 ================= */
+  $("go").addEventListener("click", connect);
+  $("stop").addEventListener("click", function(){ stop(false); });
+  $("room").addEventListener("keydown", function(e){ if(e.key==="Enter") connect(); });
+  $("radius").addEventListener("change", function(){ if(room && ws && ws.readyState===1) connect(); });
+
+  try{ var saved=localStorage.getItem("dfm_last_room"); if(saved) $("room").value=saved; }catch(e){}
+
+  if(location.protocol==="https:"){
+    var px=$("useproxy"); if(px) px.checked = true;
+    warn("⚠️ 当前页面是 <b>https</b> 打开的，浏览器会拦截 <code>ws://</code>（混合内容），直连必然全部失败。"+
+         "<br>已自动勾选「<b>本地代理</b>」—— 前提是本地中继正在运行（<code>python3 radar_proxy.py</code>）。"+
+         "<br>或者把文件存到电脑，用 <b>Finder 双击</b>打开（地址栏为 <code>file://</code>），即可直连。");
+  }
+})();
+</script>
+</body>
+</html>
