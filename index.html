@@ -102,7 +102,14 @@
       <option value="50">50（激进）</option>
     </select>
   </label>
-  <label class="tag" style="border:none"><input type="checkbox" id="useproxy" style="width:auto;vertical-align:-1px"> 本地代理</label>
+  <label class="tag" style="border:none">连接
+    <select id="mode">
+      <option value="direct">直连节点 (ws://)</option>
+      <option value="local">本地中继 (127.0.0.1:8898)</option>
+      <option value="wss">公网 wss 中继</option>
+    </select>
+  </label>
+  <input id="wssurl" style="width:250px" placeholder="wss://ws.enenh.com/ws?room=" autocomplete="off">
   <button id="scan">开始扫描</button>
   <button id="scanStop" class="ghost" disabled>停止</button>
   <div class="prog"><i id="bar"></i></div>
@@ -168,10 +175,17 @@
 (function(){
   "use strict";
 
-  var PROXY = "ws://127.0.0.1:8898/ws?room=";
-  function useProxy(){ var e=$("useproxy"); return !!(e && e.checked); }
+  var LOCAL = "ws://127.0.0.1:8898/ws?room=";
+  function mode(){ var e=$("mode"); return e ? e.value : "direct"; }
   function wsUrl(host, port, room){
-    return useProxy() ? (PROXY + room) : ("ws://" + host + ":" + port + "/ws?room=" + room);
+    var m = mode();
+    if(m === "local") return LOCAL + room;
+    if(m === "wss"){
+      var b = ($("wssurl") && $("wssurl").value.trim()) || "wss://ws.enenh.com/ws?room=";
+      if(b.indexOf("room=") < 0) b = b.replace(/\/+$/, "") + "/ws?room=";
+      return b + room;
+    }
+    return "ws://" + host + ":" + port + "/ws?room=" + room;
   }
 
   var NODES = {
@@ -475,11 +489,20 @@
   try{ var saved=localStorage.getItem("dfm_last_room"); if(saved) $("room").value=saved; }catch(e){}
 
   if(location.protocol==="https:"){
-    var px=$("useproxy"); if(px) px.checked = true;
-    warn("⚠️ 当前页面是 <b>https</b> 打开的，浏览器会拦截 <code>ws://</code>（混合内容），直连必然全部失败。"+
-         "<br>已自动勾选「<b>本地代理</b>」—— 前提是本地中继正在运行（<code>python3 radar_proxy.py</code>）。"+
-         "<br>或者把文件存到电脑，用 <b>Finder 双击</b>打开（地址栏为 <code>file://</code>），即可直连。");
+    var ms=$("mode"); if(ms) ms.value = "wss";
+    warn("⚠️ 当前页面是 <b>https</b> 打开的 —— 浏览器既不允许 https 页面直连 <code>ws://</code>，"+
+         "也不允许它访问 <code>127.0.0.1</code>。<br>请用「<b>公网 wss 中继</b>」（服务端要先部署 TLS 中继），"+
+         "或把文件存到本地用 <b>Finder 双击</b>打开（<code>file://</code>）走直连。");
   }
+  try{
+    ["mode","wssurl"].forEach(function(id){
+      var e=$(id); if(!e) return;
+      var k="dfm_"+id, v=localStorage.getItem(k);
+      if(v) e.value=v;
+      e.addEventListener("change", function(){ try{ localStorage.setItem(k, e.value); }catch(_){} });
+      e.addEventListener("input",  function(){ try{ localStorage.setItem(k, e.value); }catch(_){} });
+    });
+  }catch(e){}
 })();
 </script>
 </body>
