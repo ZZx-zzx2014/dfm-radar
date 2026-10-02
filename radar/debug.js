@@ -24,6 +24,7 @@
     if (recs.length > 10) recs.shift();
     show();
   }
+  window.__dfmLog = add;   /* 供其它脚本写日志 */
 
   /* 1) fetch */
   var of = window.fetch;
