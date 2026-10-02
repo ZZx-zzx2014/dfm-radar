@@ -1,0 +1,82 @@
+/* ==========================================================================
+   DFM 雷达 · 统一主题（必须在官方 styles.css 之后加载）
+   做法：只覆盖官方的 CSS 变量 + 少量不改变布局的质感修饰
+   —— 整站配色/圆角/阴影一次到位，且不会破坏官方布局
+   ========================================================================== */
+:root {
+  color-scheme: dark;
+
+  /* ---- 官方变量（覆盖）---- */
+  --bg: #070b10;
+  --surface: #0e151d;
+  --surface-raised: #151f2a;
+  --line: #1e2b38;
+  --text: #e9f0f6;
+  --muted: #8a9bad;
+  --accent: #2fe0b0;
+  --accent-ink: #04241c;
+  --warning: #ffc84a;
+  --danger: #ff5f6d;
+
+  /* ---- 我方面板共用令牌 ---- */
+  --dfm-bg: #070b10;
+  --dfm-card: rgba(13, 20, 28, .94);
+  --dfm-card-2: rgba(17, 26, 36, .92);
+  --dfm-line: rgba(120, 190, 175, .18);
+  --dfm-line-2: rgba(255, 255, 255, .08);
+  --dfm-text: #e9f0f6;
+  --dfm-muted: #8397aa;
+  --dfm-muted-2: #5f7488;
+  --dfm-accent: #2fe0b0;
+  --dfm-accent-ink: #04241c;
+  --dfm-ally: #5fe3c0;
+  --dfm-enemy: #ff5f6d;
+  --dfm-gold: #ffc84a;
+  --dfm-radius: 14px;
+  --dfm-radius-sm: 10px;
+  --dfm-shadow: 0 12px 34px rgba(0, 0, 0, .5);
+  --dfm-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+              system-ui, "Segoe UI", sans-serif;
+}
+
+/* ---------- 全局质感（不碰布局） ---------- */
+html { background: var(--bg); }
+body {
+  background:
+    radial-gradient(1100px 620px at 50% -12%, #0c1a24 0%, rgba(7, 11, 16, 0) 62%),
+    radial-gradient(760px 420px at 92% 8%, rgba(47, 224, 176, .06) 0%, rgba(7, 11, 16, 0) 60%),
+    var(--bg) !important;
+  font-family: var(--dfm-font);
+}
+
+/* 玻璃质感：官方已有的 .surface 等容器 */
+.surface,
+.radar-header,
+.view-bar,
+.entry-screen,
+.join-card,
+.radar-bottom > * {
+  backdrop-filter: saturate(160%) blur(10px);
+  -webkit-backdrop-filter: saturate(160%) blur(10px);
+}
+
+/* 圆角与描边更柔和 */
+.surface,
+.join-card,
+.code-slot,
+.code-field {
+  border-color: var(--dfm-line-2) !important;
+}
+
+/* 交互反馈 */
+button:not(:disabled):hover { filter: brightness(1.07); }
+button:not(:disabled):active { transform: scale(.985); }
+
+::selection { background: var(--dfm-accent); color: var(--dfm-accent-ink); }
+
+/* 滚动条 */
+* { scrollbar-width: thin; scrollbar-color: #22303d transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #22303d; border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: #2d3f4f; }
+*::-webkit-scrollbar-track { background: transparent; }

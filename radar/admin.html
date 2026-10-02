@@ -7,25 +7,30 @@
 <title>DFM · 管理员面板</title>
 <style>
   :root{
-    --bg:#080c11; --bg2:#0d131a; --card:#111a23; --card2:#0f1720;
-    --line:#1d2836; --line2:#243244;
-    --fg:#e8eef5; --dim:#8296ab; --dim2:#5d7086;
-    --accent:#2fd2a8; --accent2:#1fa88a;
-    --ally:#5fe3c0; --enemy:#ff5f6d; --gold:#ffc84a; --bot:#8fa3b8;
+    --bg:#070b10; --bg2:#0d131a; --card:#0e151d; --card2:#151f2a;
+    --line:#1e2b38; --line2:#24323f;
+    --fg:#e9f0f6; --dim:#8397aa; --dim2:#5f7488;
+    --accent:#2fe0b0; --accent2:#22b892;
+    --ally:#5fe3c0; --enemy:#ff5f6d; --gold:#ffc84a; --bot:#8a9bad;
     --r:14px; --r2:10px;
+    --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,"Segoe UI",sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
-    background:linear-gradient(180deg,#0a1017 0%,#080c11 240px);
+    background:
+      radial-gradient(1100px 620px at 50% -12%, #0c1a24 0%, rgba(7,11,16,0) 62%),
+      radial-gradient(700px 400px at 92% 6%, rgba(47,224,176,.055) 0%, rgba(7,11,16,0) 60%),
+      var(--bg);
     color:var(--fg); min-height:100vh;
-    font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    font:14px/1.5 var(--font);
     padding-bottom:env(safe-area-inset-bottom);
   }
   /* ---------- 顶栏 ---------- */
   header{
     position:sticky; top:0; z-index:20;
-    background:rgba(10,16,23,.92); backdrop-filter:saturate(180%) blur(12px);
+    background:rgba(9,14,20,.90); backdrop-filter:saturate(160%) blur(14px);
+    -webkit-backdrop-filter:saturate(160%) blur(14px);
     border-bottom:1px solid var(--line);
     padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
   }
