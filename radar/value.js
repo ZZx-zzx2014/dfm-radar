@@ -48,7 +48,14 @@
     document.body.appendChild(d);
 
     document.getElementById("dvp-head").addEventListener("click", function () {
-      document.getElementById("dvp").classList.toggle("dvp-collapsed");
+      var d = document.getElementById("dvp");
+      var opening = d.classList.contains("dvp-collapsed");
+      d.classList.toggle("dvp-collapsed");
+      d.classList.toggle("dvp-exp", opening);
+      if (opening) {
+        var o = document.getElementById("dfc");
+        if (o) { o.classList.add("dfc-collapsed"); o.classList.remove("dfc-exp"); }
+      }
     });
     var r = document.getElementById("dvp-radius");
     r.addEventListener("change", function () { if (curRoom) connect(curRoom); });
@@ -239,6 +246,9 @@
     build();
     render(null);
     setState("等待房间");
+    if (window.innerWidth <= 720) {
+      var p = document.getElementById("dvp"); if (p) p.classList.add("dvp-collapsed");
+    }
     watchRoom();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);

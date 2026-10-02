@@ -1,0 +1,55 @@
+/* DFM 雷达 · 房间聊天 —— 追加样式（不覆盖官方样式） */
+#dfc {
+  position: fixed; left: 14px; bottom: 14px; z-index: 9001;
+  width: 320px; max-width: calc(100vw - 28px);
+  background: rgba(10, 16, 22, .93);
+  border: 1px solid rgba(120, 200, 190, .22);
+  border-radius: 12px; color: #e6edf3;
+  font: 13px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  backdrop-filter: blur(8px); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+#dfc.dfc-off { display: none; }
+#dfc.dfc-collapsed #dfc-body { display: none; }
+#dfc-head {
+  display: flex; align-items: center; gap: 8px; padding: 9px 11px; cursor: pointer;
+  background: rgba(255, 255, 255, .04); border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+#dfc-head b { flex: 1; font-weight: 600; font-size: 13px; letter-spacing: .4px; }
+#dfc-head .dfc-n { color: #8b9bb0; font-size: 11.5px; }
+#dfc-dot { width: 8px; height: 8px; border-radius: 50%; background: #556; flex: none; }
+#dfc-dot.on { background: #35c2a5; box-shadow: 0 0 8px #35c2a5; }
+#dfc-dot.bad { background: #ff5252; }
+#dfc-body { display: flex; flex-direction: column; height: 300px; }
+#dfc-list { flex: 1; overflow: auto; padding: 9px 11px; }
+.dfc-m { margin: 0 0 7px; word-break: break-word; }
+.dfc-m .who { color: #8b9bb0; font-size: 11px; margin-right: 5px; }
+.dfc-m.me .who { color: #35c2a5; }
+.dfc-m.sys { color: #8b9bb0; font-size: 11.5px; text-align: center; margin: 5px 0; }
+.dfc-m .txt { color: #e6edf3; }
+.dfc-m.me .txt { color: #7ce4cd; }
+#dfc-foot {
+  display: flex; gap: 6px; padding: 8px; border-top: 1px solid rgba(255, 255, 255, .07);
+}
+#dfc-input {
+  flex: 1; min-width: 0; background: #0c141c; color: #e6edf3;
+  border: 1px solid rgba(255, 255, 255, .12); border-radius: 8px;
+  padding: 7px 9px; font: inherit; outline: none;
+}
+#dfc-input:focus { border-color: #2fd2a8; }
+#dfc-send {
+  background: #2fd2a8; color: #06231d; border: none; border-radius: 8px;
+  padding: 0 13px; font: inherit; font-weight: 700; cursor: pointer;
+}
+#dfc-send:disabled { opacity: .45; }
+#dfc-name {
+  background: transparent; color: #35c2a5; border: 1px dashed rgba(53, 194, 165, .5);
+  border-radius: 6px; padding: 1px 6px; font: inherit; font-size: 11.5px;
+  cursor: pointer; max-width: 110px; overflow: hidden; text-overflow: ellipsis;
+}
+@media (max-width: 720px) {
+  #dfc { left: 8px; bottom: 8px; width: calc(50vw - 12px); }
+  #dfc.dfc-exp { width: calc(100vw - 16px); }
+  #dfc-body { height: 45vh; }
+}

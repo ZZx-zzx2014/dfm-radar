@@ -45,3 +45,9 @@
 .dvp-tag { font-size: 10.5px; padding: 0 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,.14); color: #8b9bb0; }
 .dvp-tag.dvp-ally { color: #7ce4cd; }
 .dvp-tag.dvp-enemy { color: #ff5252; }
+
+@media (max-width: 720px) {
+  #dvp { right: 8px; bottom: 8px; width: calc(50vw - 12px); }
+  #dvp.dvp-exp { width: calc(100vw - 16px); }
+  #dvp-body { max-height: 45vh; }
+}
