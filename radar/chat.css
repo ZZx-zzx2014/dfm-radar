@@ -29,23 +29,43 @@
 #dfc-dot.bad { background: var(--dfm-enemy, #ff5f6d); }
 
 #dfc-body { display: flex; flex-direction: column; height: 300px; }
-#dfc-list { flex: 1; overflow: auto; padding: 10px 12px; }
-.dfc-m { margin: 0 0 8px; word-break: break-word; }
-.dfc-m .who { color: var(--dfm-muted, #8397aa); font-size: 11px; margin-right: 5px; }
-.dfc-m.me .who { color: var(--dfm-accent, #2fe0b0); font-weight: 600; }
+#dfc-list { flex: 1; overflow: auto; padding: 12px 12px 6px; }
+.dfc-m {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin: 0 0 10px; word-break: break-word;
+  animation: dfcIn .18s cubic-bezier(.22,.9,.3,1) both;
+}
+@keyframes dfcIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.dfc-m.me { flex-direction: row-reverse; }
+.dfc-av {
+  width: 26px; height: 26px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-size: 11.5px; font-weight: 700;
+  background: rgba(255, 255, 255, .08); color: var(--dfm-muted, #8397aa);
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+.dfc-m.me .dfc-av {
+  background: linear-gradient(135deg, #2fe0b0, #1aa887);
+  color: #04241c; border-color: transparent;
+}
+.dfc-col { min-width: 0; max-width: 82%; display: flex; flex-direction: column; }
+.dfc-m.me .dfc-col { align-items: flex-end; }
+.dfc-meta { font-size: 10.5px; color: var(--dfm-muted-2, #5f7488); margin: 0 3px 3px; }
+.dfc-meta .who { color: var(--dfm-muted, #8397aa); }
+.dfc-m.me .dfc-meta .who { color: var(--dfm-accent, #2fe0b0); font-weight: 600; }
 .dfc-m.sys {
-  color: var(--dfm-muted-2, #5f7488); font-size: 11.5px; text-align: center;
-  margin: 7px 0; letter-spacing: .2px;
+  display: block; text-align: center; color: var(--dfm-muted-2, #5f7488);
+  font-size: 11px; margin: 8px 0; letter-spacing: .2px; animation: none;
 }
-.dfc-m .txt { color: var(--dfm-text, #e9f0f6); }
-.dfc-m.me { text-align: right; }
+.dfc-m .txt {
+  word-break: break-word; padding: 6px 11px;
+  border-radius: 14px 14px 14px 4px;
+  background: rgba(255, 255, 255, .06); color: var(--dfm-text, #e9f0f6);
+  display: inline-block;
+}
 .dfc-m.me .txt {
-  color: var(--dfm-accent-ink, #04241c); background: var(--dfm-accent, #2fe0b0);
-  padding: 4px 10px; border-radius: 12px 12px 3px 12px; display: inline-block; max-width: 86%;
-}
-.dfc-m:not(.me):not(.sys) .txt {
-  background: rgba(255,255,255,.06); padding: 4px 10px;
-  border-radius: 12px 12px 12px 3px; display: inline-block; max-width: 86%;
+  border-radius: 14px 14px 4px 14px;
+  background: linear-gradient(135deg, #2fe0b0, #22c39b);
+  color: #04241c; font-weight: 500;
 }
 
 #dfc-foot {

@@ -80,3 +80,97 @@ button:not(:disabled):active { transform: scale(.985); }
 *::-webkit-scrollbar-thumb { background: #22303d; border-radius: 8px; }
 *::-webkit-scrollbar-thumb:hover { background: #2d3f4f; }
 *::-webkit-scrollbar-track { background: transparent; }
+
+/* ==========================================================================
+   精修层：入场页 / 按钮 / 卡片 / 图例 —— 只加质感，不改布局
+   ========================================================================== */
+
+/* ---- 入场页：加入雷达房间 ---- */
+.join-card {
+  position: relative;
+  border: 1px solid rgba(47, 224, 176, .22) !important;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, .55),
+    0 0 0 1px rgba(47, 224, 176, .06) inset,
+    0 0 60px rgba(47, 224, 176, .07);
+  animation: dfmRise .5s cubic-bezier(.22,.9,.3,1) both;
+}
+@keyframes dfmRise {
+  from { opacity: 0; transform: translateY(14px) scale(.985); }
+  to   { opacity: 1; transform: none; }
+}
+.entry-emblem {
+  filter: drop-shadow(0 0 12px rgba(47, 224, 176, .45));
+}
+
+/* ---- 房间号输入：聚焦时发光 ---- */
+.code-field:focus-within {
+  box-shadow: 0 0 0 3px rgba(47, 224, 176, .14), 0 0 22px rgba(47, 224, 176, .12);
+  border-color: rgba(47, 224, 176, .5) !important;
+}
+.code-slot {
+  background: rgba(255, 255, 255, .035);
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.code-slot.is-active {
+  background: rgba(47, 224, 176, .1);
+  border-color: rgba(47, 224, 176, .55) !important;
+  transform: translateY(-1px);
+}
+
+/* ---- 主按钮：渐变 + 投影 + 悬浮上浮 ---- */
+.join-button, .join-button:not(:disabled) {
+  background: linear-gradient(135deg, #2fe0b0 0%, #22c39b 55%, #1aa887 100%) !important;
+  color: var(--accent-ink, #04241c) !important;
+  border: none !important;
+  box-shadow: 0 8px 22px rgba(47, 224, 176, .26);
+  transition: transform .15s, box-shadow .2s, filter .2s;
+}
+.join-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(47, 224, 176, .34);
+}
+
+/* ---- 顶栏 / 视图切换 ---- */
+.radar-header, .view-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, .06) !important;
+}
+.view-switch button[aria-pressed="true"],
+.view-switch .is-active {
+  background: linear-gradient(180deg, rgba(47,224,176,.22), rgba(47,224,176,.10)) !important;
+  color: var(--accent) !important;
+}
+
+/* ---- 图例 / 底部统计 ---- */
+.legend-item {
+  background: rgba(255, 255, 255, .04);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.marker-key { box-shadow: 0 0 6px currentColor; }
+
+/* ---- 悬浮面板 / 工具按钮 ---- */
+.map-tools button {
+  background: rgba(12, 19, 26, .88) !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .38);
+  transition: transform .15s, border-color .15s, background .15s;
+}
+.map-tools button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(47, 224, 176, .45) !important;
+  background: rgba(20, 32, 42, .95) !important;
+}
+
+/* ---- 连接状态指示 ---- */
+#connection-dot { box-shadow: 0 0 10px currentColor; }
+
+/* ---- 全局过渡 ---- */
+a, button, input, select, .surface, .legend-item { transition: color .15s, background .15s, border-color .15s; }
+
+/* ---- 键盘可达性 ---- */
+:focus-visible {
+  outline: 2px solid rgba(47, 224, 176, .65);
+  outline-offset: 2px;
+  border-radius: 6px;
+}

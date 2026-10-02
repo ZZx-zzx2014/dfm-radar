@@ -92,9 +92,13 @@
     var l = $("dfc-list"); if (!l) return;
     var el = document.createElement("div");
     el.className = "dfc-m" + (me ? " me" : "");
-    el.innerHTML = '<span class="who">' + esc(n) + '</span>' +
-                   '<span class="who" style="opacity:.6">' + hhmm(ts) + '</span>' +
-                   '<span class="txt">' + esc(t) + '</span>';
+    var initial = String(n == null ? "?" : n).trim().slice(0, 1) || "?";
+    el.innerHTML =
+      '<span class="dfc-av">' + esc(initial) + '</span>' +
+      '<span class="dfc-col">' +
+        '<span class="dfc-meta"><span class="who">' + esc(n) + '</span> ' + hhmm(ts) + '</span>' +
+        '<span class="txt">' + esc(t) + '</span>' +
+      '</span>';
     l.appendChild(el);
     trim(l); scroll();
   }
