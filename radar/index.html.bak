@@ -12,57 +12,7 @@
   <link rel="stylesheet" href="./value.css?v=8">
   <link rel="stylesheet" href="./chat.css?v=8">
   <script defer src="https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/leaflet.js"></script>
-<script>
-/* ===== WS 诊断：记录每一次 WebSocket 连接（点浮层可关闭） ===== */
-(function () {
-  var logs = [], el = null;
-  function panel() {
-    if (el) return el;
-    el = document.createElement('pre');
-    el.id = 'ws-diag';
-    el.style.cssText = 'position:fixed;left:8px;right:8px;bottom:72px;max-height:36vh;overflow:auto;' +
-      'background:rgba(8,10,12,.95);color:#9fe8c8;border:1px solid #2f3339;border-radius:10px;' +
-      'padding:8px 10px;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;z-index:99999;' +
-      'white-space:pre-wrap;word-break:break-all;-webkit-overflow-scrolling:touch';
-    el.addEventListener('click', function () { el.remove(); el = null; });
-    document.body.appendChild(el);
-    return el;
-  }
-  function add(s) {
-    var t = new Date().toTimeString().slice(0, 8);
-    logs.push('[' + t + '] ' + s);
-    if (logs.length > 60) logs.shift();
-    var p = panel(); if (p) { p.textContent = logs.join('\n'); p.scrollTop = p.scrollHeight; }
-    try { console.log('[WS]', s); } catch (e) {}
-  }
-  window.__wsDiag = add;
-  var Orig = window.WebSocket;
-  function Wrapped(url, protocols) {
-    add('→ 连接 ' + url);
-    var ws = protocols === undefined ? new Orig(url) : new Orig(url, protocols);
-    try {
-      ws.addEventListener('open', function () { add('  ✅ 已连接'); });
-      ws.addEventListener('error', function () { add('  ❌ 连接错误'); });
-      ws.addEventListener('close', function (e) {
-        add('  ⛔ 关闭 code=' + e.code + (e.reason ? ' reason=' + e.reason : '') +
-            '  [1006=网络/被拦 4004=房间不存在]');
-      });
-    } catch (e) { add('  监听失败 ' + e.message); }
-    return ws;
-  }
-  Wrapped.prototype = Orig.prototype;
-  ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'].forEach(function (k, i) { Wrapped[k] = i; });
-  window.WebSocket = Wrapped;
-  add('WS 诊断已启用（点此浮层可关闭）');
-  window.addEventListener('error', function (ev) {
-    if (ev && ev.message) add('页面错误: ' + ev.message);
-  });
-  window.addEventListener('unhandledrejection', function (ev) {
-    try { add('未处理异常: ' + (ev.reason && ev.reason.message || ev.reason)); } catch (e) {}
-  });
-})();
-</script>
-  <script type="module" src="./assets/app.js?v=3"></script>
+  <script type="module" src="./assets/app.js?v=2"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
