@@ -172,10 +172,6 @@
 
 <div class="maps" id="maps"></div>
 
-<div class="tip" style="font-size:11.5px;color:#e0a44a;margin:0 0 8px;line-height:1.6">
-  ⚠️ 列表含【活跃】和【未进入】两类房间。带「未进入」徽章的**开不了共享、连不上**，
-  请优先复制**没有徽章**的房间号（或去管理面板的 🎯 房间 页，那里只列可用房间）。
-</div>
 <div class="filters">
   <button class="chip on" data-f="all">全部</button>
   <button class="chip" data-f="star">⭐ 关注</button>
@@ -398,7 +394,7 @@
         var names="";
         (r.an||[]).slice(0,8).forEach(function(n){ names+='<span class="nm a">'+esc(n)+'</span>'; });
         (r.en||[]).slice(0,8).forEach(function(n){ names+='<span class="nm e">'+esc(n)+'</span>'; });
-        return '<div class="room'+(hot?" hot":"")+(stars[r.room]?" star":"")+'" data-room="'+r.room+'" data-status="'+(not?'notentered':'active')+'">'+
+        return '<div class="room'+(hot?" hot":"")+(stars[r.room]?" star":"")+'" data-room="'+r.room+'">'+
           '<div class="r1">'+
             '<span class="rno">'+r.room+'</span>'+
             '<span class="node">'+r.node+'号</span>'+
@@ -524,7 +520,8 @@
     if(open){ window.open("index.html?room="+open.getAttribute("data-open"), "_blank"); return; }
     var cp=e.target.closest("[data-copy]");
     if(cp){ copy(cp.getAttribute("data-copy")); toast("房间号 "+cp.getAttribute("data-copy")+" 已复制"); return; }
-    var card=e.target.closest(".room");if(card){var rn=card.getAttribute("data-room"),st=card.getAttribute("data-status");copy(rn);toast(st==="active"?("🟢 房间号 "+rn+" 已复制（可进）"):("⚠️ 房间号 "+rn+" 已复制，但该房间【未进入共享】，可能连不上"));}
+    var card=e.target.closest(".room");
+    if(card){ copy(card.getAttribute("data-room")); toast("房间号 "+card.getAttribute("data-room")+" 已复制"); }
   });
   $("rows").addEventListener("click", function(e){
     var tr=e.target.closest("tr[data-room]"); if(!tr) return;
