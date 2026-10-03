@@ -14,9 +14,9 @@
   <script defer src="https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/leaflet.js"></script>
 <script>
 /* ===== WS 诊断：记录每一次 WebSocket 连接（点浮层可关闭） ===== */
+/* 临时禁用：默认不显示诊断浮层；需要时在网址后加 ?diag=1 打开 */
+if (!/[?&]diag=1/.test(location.search)) return;
 (function () {
-  /* 默认不显示诊断浮层；需要时在网址后加 ?diag=1 打开（return 必须在函数内！） */
-  if (!/[?&]diag=1/.test(location.search)) return;
   var logs = [], el = null;
   function panel() {
     if (el) return el;
@@ -37,34 +37,6 @@
     var p = panel(); if (p) { p.textContent = logs.join('\n'); p.scrollTop = p.scrollHeight; }
     try { console.log('[WS]', s); } catch (e) {}
   }
-
-  window.__wsDiag = add;
-  var Orig = window.WebSocket;
-  function Wrapped(url, protocols) {
-    add('→ 连接 ' + url);
-    var ws = protocols === undefined ? new Orig(url) : new Orig(url, protocols);
-    try {
-      ws.addEventListener('open', function () { add('  ✅ 已连接'); });
-      ws.addEventListener('error', function () { add('  ❌ 连接错误'); });
-      ws.addEventListener('close', function (e) {
-        add('  ⛔ 关闭 code=' + e.code + (e.reason ? ' reason=' + e.reason : '') +
-            '  [1006=网络/被拦 4004=房间不存在]');
-      });
-    } catch (e) { add('  监听失败 ' + e.message); }
-    return ws;
-  }
-  Wrapped.prototype = Orig.prototype;
-  ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'].forEach(function (k, i) { Wrapped[k] = i; });
-  window.WebSocket = Wrapped;
-  add('WS 诊断已启用（点此浮层可关闭）');
-  window.addEventListener('error', function (ev) {
-    if (ev && ev.message) add('页面错误: ' + ev.message);
-  });
-  window.addEventListener('unhandledrejection', function (ev) {
-    try { add('未处理异常: ' + (ev.reason && ev.reason.message || ev.reason)); } catch (e) {}
-  });
-})();
-</script>
 <script>
 /* ===== 卡密验证门 ===== */
 (function () {
@@ -148,7 +120,34 @@
   if (saved) { verify(saved, true); } else { show(''); }
 })();
 </script>
-  <script type="module" src="./assets/app.js?v=7"></script>
+  window.__wsDiag = add;
+  var Orig = window.WebSocket;
+  function Wrapped(url, protocols) {
+    add('→ 连接 ' + url);
+    var ws = protocols === undefined ? new Orig(url) : new Orig(url, protocols);
+    try {
+      ws.addEventListener('open', function () { add('  ✅ 已连接'); });
+      ws.addEventListener('error', function () { add('  ❌ 连接错误'); });
+      ws.addEventListener('close', function (e) {
+        add('  ⛔ 关闭 code=' + e.code + (e.reason ? ' reason=' + e.reason : '') +
+            '  [1006=网络/被拦 4004=房间不存在]');
+      });
+    } catch (e) { add('  监听失败 ' + e.message); }
+    return ws;
+  }
+  Wrapped.prototype = Orig.prototype;
+  ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'].forEach(function (k, i) { Wrapped[k] = i; });
+  window.WebSocket = Wrapped;
+  add('WS 诊断已启用（点此浮层可关闭）');
+  window.addEventListener('error', function (ev) {
+    if (ev && ev.message) add('页面错误: ' + ev.message);
+  });
+  window.addEventListener('unhandledrejection', function (ev) {
+    try { add('未处理异常: ' + (ev.reason && ev.reason.message || ev.reason)); } catch (e) {}
+  });
+})();
+</script>
+  <script type="module" src="./assets/app.js?v=5"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
