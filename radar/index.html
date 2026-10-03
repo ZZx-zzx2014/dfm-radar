@@ -90,6 +90,7 @@
     document.head.appendChild(st);
   }
   function show(msg) {
+    if (!document.body) { setTimeout(function(){ show(msg); }, 120); return; }
     style();
     if (document.getElementById('kkey-mask')) return;
     var m = document.createElement('div');
@@ -144,8 +145,16 @@
         }
       });
   }
-  var saved = localStorage.getItem('dfm_key');
-  if (saved) { verify(saved, true); } else { show(''); }
+  /* 等待 DOM 就绪再执行（脚本在 <head> 里，此时 document.body 还是 null） */
+  function boot() {
+    var saved = localStorage.getItem('dfm_key');
+    if (saved) { verify(saved, true); } else { show(''); }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();
 </script>
   <script type="module" src="./assets/app.js?v=7"></script>
