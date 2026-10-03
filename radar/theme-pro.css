@@ -1,0 +1,258 @@
+/* ==========================================================================
+   DFM RADAR · Commercial Theme (theme-pro.css)
+   商业级主题：统一设计令牌 + 组件精修 + 微交互
+   加载顺序：必须放在 theme.css / styles.css / value.css / chat.css 之后
+   ========================================================================== */
+
+:root {
+  /* ---- 色板（商业级中性色阶） ---- */
+  --p-bg:        #0b0d10;
+  --p-bg-elev:   #121519;
+  --p-surface:   #16191e;
+  --p-surface-2: #1c2027;
+  --p-surface-3: #232830;
+  --p-line:      #262b33;
+  --p-line-soft: #1e2229;
+  --p-line-strong:#343b45;
+
+  --p-fg:        #f2f4f7;
+  --p-fg-2:      #b9c0ca;
+  --p-fg-3:      #8b939e;
+  --p-fg-4:      #5f6772;
+
+  --p-accent:      #10a37f;
+  --p-accent-2:    #0d8a6a;
+  --p-accent-soft: rgba(16, 163, 127, .12);
+  --p-accent-line: rgba(16, 163, 127, .42);
+  --p-accent-glow: rgba(16, 163, 127, .18);
+
+  --p-warn:   #d9a441;
+  --p-danger: #e5646b;
+  --p-info:   #4a8fe0;
+  --p-gold:   #e3b341;
+
+  /* ---- 排版 ---- */
+  --p-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+            "Microsoft YaHei", system-ui, "Segoe UI", Roboto, sans-serif;
+  --p-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---- 圆角 ---- */
+  --p-r-xs: 6px;
+  --p-r-sm: 9px;
+  --p-r-md: 12px;
+  --p-r-lg: 16px;
+  --p-r-full: 999px;
+
+  /* ---- 阴影（三级海拔） ---- */
+  --p-sh-1: 0 1px 2px rgba(0,0,0,.28), 0 1px 1px rgba(0,0,0,.18);
+  --p-sh-2: 0 4px 14px rgba(0,0,0,.34), 0 1px 3px rgba(0,0,0,.22);
+  --p-sh-3: 0 16px 48px rgba(0,0,0,.48), 0 4px 12px rgba(0,0,0,.30);
+  --p-sh-accent: 0 6px 20px rgba(16,163,127,.22);
+
+  /* ---- 过渡 ---- */
+  --p-ease: cubic-bezier(.16,.84,.44,1);
+  --p-t-fast: .14s var(--p-ease);
+  --p-t: .22s var(--p-ease);
+
+  /* ---- 兼容旧变量名（覆盖到商业主题） ---- */
+  --bg: var(--p-bg);
+  --surface: var(--p-surface);
+  --surface-raised: var(--p-surface-2);
+  --line: var(--p-line);
+  --text: var(--p-fg);
+  --muted: var(--p-fg-3);
+  --accent: var(--p-accent);
+  --accent-ink: #fff;
+  --warning: var(--p-warn);
+  --danger: var(--p-danger);
+
+  --dfm-bg: var(--p-bg);
+  --dfm-card: var(--p-surface);
+  --dfm-card-2: var(--p-surface-2);
+  --dfm-line: var(--p-line);
+  --dfm-line-2: var(--p-line-strong);
+  --dfm-text: var(--p-fg);
+  --dfm-muted: var(--p-fg-3);
+  --dfm-muted-2: var(--p-fg-4);
+  --dfm-accent: var(--p-accent);
+  --dfm-accent-soft: var(--p-accent-soft);
+  --dfm-accent-line: var(--p-accent-line);
+  --dfm-radius: var(--p-r-md);
+  --dfm-radius-sm: var(--p-r-sm);
+  --dfm-shadow: var(--p-sh-2);
+  --dfm-font: var(--p-font);
+}
+
+/* ---- 全局排版与渲染 ---- */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--p-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  background: var(--p-bg);
+  color: var(--p-fg);
+  letter-spacing: .006em;
+}
+
+/* 背景层：极淡的径向光 + 细网格（质感，不抢内容） */
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(1100px 620px at 50% -12%, rgba(16,163,127,.085), transparent 62%),
+    radial-gradient(760px 460px at 88% 106%, rgba(74,143,224,.055), transparent 60%);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  background-image:
+    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+  background-size: 44px 44px, 44px 44px;
+}
+body > * { position: relative; z-index: 1; }
+
+/* ---- 品牌区 ---- */
+.brand { gap: 10px; }
+.brand-icon {
+  border-radius: var(--p-r-sm) !important;
+  box-shadow: var(--p-sh-1), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.brand-title, .brand { letter-spacing: .01em; }
+.brand-subtitle, .eyebrow {
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: var(--p-fg-4);
+}
+.brand-divider { opacity: .35; }
+
+/* ---- 卡片 / 面板 ---- */
+.join-card,
+.entry-screen .card {
+  background: linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,0)) , var(--p-surface) !important;
+  border: 1px solid var(--p-line) !important;
+  border-radius: var(--p-r-lg) !important;
+  box-shadow: var(--p-sh-3) !important;
+  backdrop-filter: blur(8px);
+}
+.entry-emblem {
+  border-radius: var(--p-r-md) !important;
+  background: linear-gradient(180deg, rgba(16,163,127,.20), rgba(16,163,127,.08)) !important;
+  border: 1px solid var(--p-accent-line) !important;
+  box-shadow: var(--p-sh-1), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.entry-description, .room-label { color: var(--p-fg-2); }
+.entry-meta, .foot, .footer { color: var(--p-fg-4); }
+
+/* ---- 房间号输入格 ---- */
+.code-slot {
+  background: var(--p-surface-2) !important;
+  border: 1px solid var(--p-line-strong) !important;
+  border-radius: var(--p-r-sm) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.28);
+  transition: border-color var(--p-t-fast), box-shadow var(--p-t-fast), background var(--p-t-fast);
+  font-variant-numeric: tabular-nums;
+}
+.code-slot.is-active {
+  border-color: var(--p-accent-line) !important;
+  box-shadow: 0 0 0 3px var(--p-accent-soft), inset 0 1px 2px rgba(0,0,0,.28);
+  background: var(--p-surface-3) !important;
+}
+.code-input { letter-spacing: .32em; font-family: var(--p-mono); }
+.code-field.is-invalid .code-slot { border-color: rgba(229,100,107,.65) !important; }
+
+/* ---- 按钮 ---- */
+button, .btn, #join-button, #kkey-btn {
+  border-radius: var(--p-r-sm) !important;
+  font-weight: 600 !important;
+  letter-spacing: .01em;
+  transition: transform var(--p-t-fast), box-shadow var(--p-t-fast),
+              background var(--p-t-fast), border-color var(--p-t-fast), opacity var(--p-t-fast);
+}
+#join-button, .btn-primary, button[type="submit"] {
+  background: linear-gradient(180deg, #12b489, var(--p-accent)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: var(--p-sh-accent), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  color: #fff !important;
+}
+#join-button:hover, .btn-primary:hover, button[type="submit"]:hover {
+  background: linear-gradient(180deg, #14c295, var(--p-accent-2)) !important;
+  box-shadow: 0 8px 26px rgba(16,163,127,.28), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+button:active, .btn:active, #join-button:active { transform: translateY(1px) scale(.994); }
+button:disabled, .btn:disabled, #join-button:disabled { opacity: .45 !important; box-shadow: none !important; }
+
+/* ---- 连接状态 HUD / 徽标 ---- */
+.connection-hud, .auto-badge {
+  background: rgba(18,21,25,.86) !important;
+  border: 1px solid var(--p-line) !important;
+  border-radius: var(--p-r-full) !important;
+  box-shadow: var(--p-sh-2);
+  backdrop-filter: blur(10px) saturate(140%);
+  font-variant-numeric: tabular-nums;
+}
+.connection-hud .dot, #connection-dot { box-shadow: 0 0 0 3px rgba(255,255,255,.04); }
+
+/* ---- 聊天面板 ---- */
+#dfc {
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--p-surface) !important;
+  border: 1px solid var(--p-line) !important;
+  border-radius: var(--p-r-lg) !important;
+  box-shadow: var(--p-sh-3) !important;
+}
+#dfc-head { border-bottom: 1px solid var(--p-line-soft) !important; }
+#dfc-input {
+  background: var(--p-surface-2) !important;
+  border: 1px solid var(--p-line-strong) !important;
+  border-radius: var(--p-r-sm) !important;
+  transition: border-color var(--p-t-fast), box-shadow var(--p-t-fast);
+}
+#dfc-input:focus {
+  border-color: var(--p-accent-line) !important;
+  box-shadow: 0 0 0 3px var(--p-accent-soft) !important;
+}
+#dfc-send { border-radius: var(--p-r-sm) !important; }
+.dfc-m { border-radius: var(--p-r-sm) !important; }
+.dfc-av { border-radius: var(--p-r-full) !important; }
+
+/* ---- 玩家价值面板 ---- */
+.dvp, #dvp, .value-panel {
+  background: var(--p-surface) !important;
+  border: 1px solid var(--p-line) !important;
+  border-radius: var(--p-r-md) !important;
+  box-shadow: var(--p-sh-2) !important;
+}
+.dvp-empty, .dvp-empty { color: var(--p-fg-4) !important; }
+
+/* ---- 滚动条（细致化） ---- */
+* { scrollbar-width: thin; scrollbar-color: var(--p-line-strong) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--p-line-strong);
+  border-radius: var(--p-r-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: #414954; background-clip: content-box; }
+
+/* ---- 焦点可见性（无障碍） ---- */
+:focus-visible {
+  outline: 2px solid var(--p-accent-line);
+  outline-offset: 2px;
+}
+
+/* ---- 动效偏好 ---- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* ---- 移动端微调 ---- */
+@media (max-width: 520px) {
+  .join-card { border-radius: var(--p-r-md) !important; }
+  .code-slot { border-radius: var(--p-r-xs) !important; }
+}
