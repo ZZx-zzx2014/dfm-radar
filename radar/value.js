@@ -242,6 +242,18 @@
     if ($("dvp-sum")) $("dvp-sum").textContent = "0";
   }
 
+  /* ---------- 深链：?room=1234 自动进入房间 ---------- */
+  function deepLink() {
+    var m = /[?&]room=(\d{4})/.exec(location.search);
+    if (!m) return;
+    var inp = document.getElementById("room-code");
+    var btn = document.getElementById("join-button");
+    if (!inp || !btn) return;
+    inp.value = m[1];
+    inp.dispatchEvent(new Event("input", { bubbles: true }));
+    setTimeout(function () { try { btn.click(); } catch (e) {} }, 500);
+  }
+
   function boot() {
     build();
     render(null);
@@ -250,6 +262,7 @@
       var p = document.getElementById("dvp"); if (p) p.classList.add("dvp-collapsed");
     }
     watchRoom();
+    setTimeout(deepLink, 900);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

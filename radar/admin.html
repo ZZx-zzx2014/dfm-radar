@@ -3,162 +3,155 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0f14">
-<title>DFM · 管理员面板</title>
+<meta name="theme-color" content="#0e0f11">
+<title>DFM · 控制台</title>
 <style>
   :root{
-    --bg:#0e0f11; --bg2:#16181b; --card:#16181b; --card2:#1c1f23;
-    --line:#26292e; --line2:#2f3339;
+    --bg:#0e0f11; --card:#16181b; --card2:#1c1f23; --line:#26292e; --line2:#2f3339;
     --fg:#ececf1; --dim:#9aa0a6; --dim2:#6b7076;
-    --accent:#10a37f; --accent2:#0e9070;
-    --ally:#4fd1b0; --enemy:#ef6b73; --gold:#e3b341; --bot:#9aa0a6;
+    --accent:#10a37f; --accent2:#0e9070; --accent-soft:rgba(16,163,127,.13);
+    --accent-line:rgba(16,163,127,.38);
+    --ally:#4fd1b0; --enemy:#ef6b73; --gold:#e3b341;
     --r:12px; --r2:8px;
     --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,"Segoe UI",sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0}
   body{
-    background:var(--bg);
-    color:var(--fg); min-height:100vh;
-    font:14px/1.5 var(--font);
-    -webkit-font-smoothing:antialiased;
+    margin:0;background:var(--bg);color:var(--fg);min-height:100vh;
+    font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased;
     padding-bottom:env(safe-area-inset-bottom);
   }
   /* ---------- 顶栏 ---------- */
   header{
-    position:sticky; top:0; z-index:20;
-    background:rgba(14,15,17,.92); backdrop-filter:saturate(140%) blur(12px);
-    -webkit-backdrop-filter:saturate(140%) blur(12px);
+    position:sticky;top:0;z-index:20;background:rgba(14,15,17,.94);
+    backdrop-filter:saturate(140%) blur(12px);-webkit-backdrop-filter:saturate(140%) blur(12px);
     border-bottom:1px solid var(--line);
     padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
   }
-  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  h1{margin:0;font-size:16px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+  .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h1{margin:0;font-size:15px;font-weight:600;white-space:nowrap}
   h1 i{font-style:normal;color:var(--accent)}
   .spacer{flex:1}
   .btn{
-    display:inline-flex;align-items:center;gap:6px;
-    border:1px solid var(--line2); background:#131d27; color:var(--fg);
-    border-radius:var(--r2); padding:7px 12px; font-size:13px; cursor:pointer;
-    transition:.15s; font-weight:500;
+    display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line2);
+    background:var(--card2);color:var(--fg);border-radius:var(--r2);
+    padding:6px 11px;font:inherit;font-size:13px;cursor:pointer;transition:.14s;
   }
-  .btn:active{transform:scale(.97)}
-  .btn.primary{background:var(--accent);border-color:transparent;color:#06231d;font-weight:700}
+  .btn:hover{background:#23272c}
+  .btn.primary{background:var(--accent);border-color:transparent;color:#fff;font-weight:600}
+  .btn.primary:hover{background:var(--accent2)}
   .btn.ghost{background:transparent;color:var(--dim)}
+  .btn.on{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
   .btn:disabled{opacity:.45}
-  .btn .ic{font-size:14px;line-height:1}
-  .searchwrap{position:relative;flex:1 1 190px;min-width:150px}
+  .searchwrap{position:relative;flex:1 1 180px;min-width:140px}
   .searchwrap input{
-    width:100%; padding:8px 11px 8px 32px; font-size:14px;
-    background:#0c141c; border:1px solid var(--line2); border-radius:var(--r2);
-    color:var(--fg); outline:none;
+    width:100%;padding:7px 11px 7px 30px;font:inherit;font-size:13.5px;
+    background:var(--card2);border:1px solid var(--line2);border-radius:var(--r2);
+    color:var(--fg);outline:none;transition:.14s;
   }
-  .searchwrap input:focus{border-color:var(--accent2)}
-  .searchwrap::before{
-    content:"🔍"; position:absolute; left:10px; top:50%; transform:translateY(-50%);
-    font-size:12px; opacity:.6; pointer-events:none;
-  }
-  /* ---------- 统计 ---------- */
-  .stats{
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(78px,1fr)); gap:8px;
-    padding:10px 14px 0;
-  }
-  .st{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--r2);
-    padding:8px 10px;
-  }
-  .st b{display:block;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
+  .searchwrap input:focus{border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
+  .searchwrap::before{content:"⌕";position:absolute;left:10px;top:50%;transform:translateY(-50%);
+    font-size:15px;color:var(--dim2);pointer-events:none}
+  /* ---------- 概览 ---------- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px;padding:11px 14px 0}
+  .st{background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:8px 10px}
+  .st b{display:block;font-size:17px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.25}
   .st span{font-size:11px;color:var(--dim)}
-  .st.ally b{color:var(--ally)} .st.enemy b{color:var(--enemy)}
-  .st.val b{color:var(--gold)}
-  /* ---------- 过滤条 ---------- */
-  .filters{
-    display:flex;gap:8px;overflow-x:auto;padding:10px 14px;
-    -webkit-overflow-scrolling:touch; scrollbar-width:none;
-  }
+  .st.ally b{color:var(--ally)} .st.enemy b{color:var(--enemy)} .st.val b{color:var(--gold)}
+  /* ---------- 迷你趋势 ---------- */
+  .spark{margin:10px 14px 0;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r2);padding:9px 11px;display:flex;align-items:center;gap:10px}
+  .spark canvas{flex:1;height:34px;display:block}
+  .spark .lbl{font-size:11px;color:var(--dim);white-space:nowrap}
+  /* ---------- 地图聚合 ---------- */
+  .maps{display:flex;gap:8px;overflow-x:auto;padding:11px 14px 0;scrollbar-width:none}
+  .maps::-webkit-scrollbar{display:none}
+  .mapcard{flex:none;background:var(--card);border:1px solid var(--line);border-radius:var(--r2);
+    padding:7px 11px;min-width:96px;cursor:pointer;transition:.14s}
+  .mapcard:hover{border-color:var(--line2);background:var(--card2)}
+  .mapcard.on{border-color:var(--accent-line);background:var(--accent-soft)}
+  .mapcard b{display:block;font-size:13px;font-weight:600}
+  .mapcard span{font-size:11px;color:var(--dim)}
+  /* ---------- 筛选 ---------- */
+  .filters{display:flex;gap:7px;overflow-x:auto;padding:11px 14px;scrollbar-width:none}
   .filters::-webkit-scrollbar{display:none}
-  .chip{
-    flex:none; border:1px solid var(--line2); background:#101a23; color:var(--dim);
-    border-radius:999px; padding:6px 13px; font-size:12.5px; cursor:pointer; white-space:nowrap;
-    transition:.15s;
-  }
-  .chip.on{background:var(--accent);border-color:transparent;color:#06231d;font-weight:700}
-  .srcbar{
-    display:flex;align-items:center;gap:8px;padding:0 14px 10px;font-size:11.5px;color:var(--dim2);
-    flex-wrap:wrap;
-  }
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;
-       box-shadow:0 0 8px var(--accent)}
-  .dot.off{background:var(--dim2);box-shadow:none}
-  /* ---------- 卡片列表 ---------- */
-  .list{padding:4px 14px 40px;display:grid;gap:10px}
-  @media(min-width:900px){ .list{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))} }
-  .room{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--r);
-    padding:11px 12px; cursor:pointer; transition:.15s; position:relative; overflow:hidden;
-  }
-  .room:active{transform:scale(.985)}
-  .room.hot{border-color:rgba(255,200,74,.42)}
-  .room.hot::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
-  .room.idle{opacity:.72}
-  .r1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-  .rno{font-size:18px;font-weight:800;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+  .chip{flex:none;border:1px solid var(--line2);background:var(--card2);color:var(--dim);
+    border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:.14s}
+  .chip.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);font-weight:600}
+  .adv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 14px 10px;font-size:12px;color:var(--dim)}
+  .adv input[type=range]{width:130px;accent-color:var(--accent)}
+  .adv select{background:var(--card2);color:var(--fg);border:1px solid var(--line2);
+    border-radius:6px;padding:3px 7px;font:inherit;font-size:12px;outline:none}
+  .srcbar{display:flex;align-items:center;gap:8px;padding:0 14px 10px;font-size:11.5px;color:var(--dim2);flex-wrap:wrap}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+  .dot.off{background:var(--dim2)}
+  /* ---------- 列表 ---------- */
+  .list{padding:2px 14px 40px;display:grid;gap:9px}
+  @media(min-width:900px){.list{grid-template-columns:repeat(auto-fill,minmax(400px,1fr))}}
+  .room{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:11px 12px;transition:.14s;position:relative}
+  .room:hover{border-color:var(--line2);background:var(--card2)}
+  .room.star{border-color:rgba(227,179,65,.45)}
+  .room.hot::after{content:"";position:absolute;left:0;top:10px;bottom:10px;width:2px;
+    border-radius:2px;background:var(--gold)}
+  .r1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .rno{font-size:17px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
   .node{font-size:11px;color:var(--dim2);border:1px solid var(--line2);border-radius:5px;padding:0 5px}
-  .map{font-size:13px;color:var(--dim)}
-  .val{margin-left:auto;font-size:16px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
-  .val.zero{color:var(--dim2);font-weight:600;font-size:14px}
+  .map{font-size:12.5px;color:var(--dim)}
+  .star-btn{margin-left:auto;background:none;border:none;font-size:15px;cursor:pointer;
+    color:var(--dim2);padding:0 2px;line-height:1}
+  .star-btn.on{color:var(--gold)}
+  .val{font-size:16px;font-weight:650;color:var(--gold);font-variant-numeric:tabular-nums}
+  .val.zero{color:var(--dim2);font-weight:500;font-size:14px}
+  .delta{font-size:11.5px;font-variant-numeric:tabular-nums}
+  .delta.up{color:var(--ally)} .delta.down{color:var(--enemy)} .delta.new{color:var(--accent)}
   .r2{display:flex;gap:12px;margin-top:7px;font-size:12.5px;color:var(--dim);flex-wrap:wrap}
-  .r2 u{text-decoration:none;font-weight:700;font-variant-numeric:tabular-nums}
-  .r2 .a u{color:var(--ally)} .r2 .e u{color:var(--enemy)} .r2 .b u{color:var(--bot)}
+  .r2 u{text-decoration:none;font-weight:600;font-variant-numeric:tabular-nums}
+  .r2 .a u{color:var(--ally)} .r2 .e u{color:var(--enemy)}
   .names{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-  .nm{
-    font-size:11.5px;padding:2px 7px;border-radius:6px;max-width:100%;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
-  .nm.a{color:var(--ally);background:rgba(95,227,192,.10);border:1px solid rgba(95,227,192,.28)}
-  .nm.e{color:var(--enemy);background:rgba(255,95,109,.10);border:1px solid rgba(255,95,109,.26)}
+  .nm{font-size:11.5px;padding:2px 7px;border-radius:6px;max-width:100%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nm.a{color:var(--ally);background:rgba(79,209,176,.12);border:1px solid rgba(79,209,176,.3)}
+  .nm.e{color:var(--enemy);background:rgba(239,107,115,.12);border:1px solid rgba(239,107,115,.28)}
   .badge{font-size:10.5px;padding:1px 6px;border-radius:5px;border:1px solid var(--line2);color:var(--dim2)}
-  .badge.not{border-color:rgba(255,200,74,.4);color:var(--gold)}
+  .badge.not{border-color:rgba(227,179,65,.4);color:var(--gold)}
+  .acts{display:flex;gap:7px;margin-top:9px}
+  .acts .btn{padding:4px 10px;font-size:12px}
   /* ---------- 表格视图 ---------- */
   .tablewrap{display:none;padding:0 14px 40px;overflow:auto}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{position:sticky;top:0;background:#0c1319;color:var(--dim);font-weight:500;font-size:11.5px;z-index:2}
-  th.sortable{cursor:pointer}
+  th{position:sticky;top:0;background:var(--card);color:var(--dim);font-weight:500;font-size:11.5px;z-index:2}
+  th.sortable{cursor:pointer} th.sortable:hover{color:var(--fg)}
   td.num{text-align:right;font-variant-numeric:tabular-nums}
-  tbody tr:hover{background:#131d27}
-  tbody tr{cursor:pointer}
+  tbody tr:hover{background:var(--card2)} tbody tr{cursor:pointer}
   body.tableview .list{display:none}
   body.tableview .tablewrap{display:block}
   /* ---------- 其他 ---------- */
   .empty{padding:56px 20px;text-align:center;color:var(--dim2)}
-  .empty .big{font-size:30px;margin-bottom:10px;opacity:.5}
-  .skeleton{height:76px;border-radius:var(--r);background:linear-gradient(90deg,#111a23 25%,#16222e 50%,#111a23 75%);
-            background-size:200% 100%;animation:sk 1.3s infinite}
-  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  .toast{
-    position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
-    background:var(--accent);color:#06231d;font-weight:700;font-size:13.5px;
-    padding:9px 18px;border-radius:999px;opacity:0;transition:.22s;z-index:60;pointer-events:none;
-  }
+  .empty .big{font-size:28px;margin-bottom:10px;opacity:.5}
+  .toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(16px);
+    background:var(--accent);color:#fff;font-weight:600;font-size:13.5px;padding:8px 18px;
+    border-radius:999px;opacity:0;transition:.2s;z-index:60;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .warnbox{margin:0 14px 10px;padding:10px 13px;border-radius:var(--r2);
-           background:rgba(255,200,74,.09);border:1px solid rgba(255,200,74,.3);
-           color:var(--gold);font-size:12.5px}
+  .warnbox{margin:0 14px 10px;padding:9px 12px;border-radius:var(--r2);
+    background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.32);color:var(--gold);font-size:12.5px}
 </style>
 </head>
 <body>
 
 <header>
   <div class="top">
-    <h1>DFM <i>· 管理面板</i></h1>
+    <h1>DFM <i>· 控制台</i></h1>
     <div class="spacer"></div>
-    <button class="btn ghost" id="viewBtn" title="切换视图"><span class="ic">▤</span><span id="viewTxt">表格</span></button>
-    <button class="btn primary" id="reload"><span class="ic">⟳</span>刷新</button>
+    <button class="btn ghost" id="sound" title="高价值提醒">🔔 提醒</button>
+    <button class="btn ghost" id="csv">导出 CSV</button>
+    <button class="btn ghost" id="viewBtn"><span id="viewTxt">表格</span></button>
+    <button class="btn primary" id="reload">刷新</button>
   </div>
   <div class="top" style="margin-top:9px">
     <div class="searchwrap"><input id="q" placeholder="搜房间号 / 玩家名 / 地图" autocomplete="off"></div>
-    <label class="btn ghost" style="gap:6px"><input type="checkbox" id="auto" checked style="accent-color:var(--accent)"> 自动</label>
+    <label class="btn ghost"><input type="checkbox" id="auto" checked style="accent-color:var(--accent)"> 自动 20s</label>
   </div>
 </header>
 
@@ -168,28 +161,43 @@
   <div class="st ally"><b id="cAlly">–</b><span>我方玩家</span></div>
   <div class="st enemy"><b id="cEnemy">–</b><span>敌方玩家</span></div>
   <div class="st val"><b id="cTotal">–</b><span>总价值</span></div>
-  <div class="st"><b id="cClosed">–</b><span>已关闭</span></div>
+  <div class="st"><b id="cPeers">–</b><span>在线人次</span></div>
 </div>
+
+<div class="spark">
+  <span class="lbl">总价值趋势</span>
+  <canvas id="spark" width="600" height="68"></canvas>
+  <span class="lbl" id="sparkTxt">—</span>
+</div>
+
+<div class="maps" id="maps"></div>
 
 <div class="filters">
   <button class="chip on" data-f="all">全部</button>
+  <button class="chip" data-f="star">⭐ 关注</button>
   <button class="chip" data-f="players">有玩家</button>
   <button class="chip" data-f="ally">我方≥1</button>
   <button class="chip" data-f="enemy">有敌方</button>
   <button class="chip" data-f="rich">价值≥50万</button>
+  <button class="chip" data-f="up">价值上涨</button>
   <button class="chip" data-f="notentered">未进入</button>
 </div>
 
+<div class="adv">
+  <span>最低价值</span>
+  <input type="range" id="minVal" min="0" max="2000000" step="50000" value="0">
+  <b id="minValTxt" style="color:var(--fg)">0</b>
+  <span>我方人数</span>
+  <select id="minAlly"><option value="0">不限</option><option value="1">≥1</option>
+    <option value="2">≥2</option><option value="3">≥3</option></select>
+</div>
+
 <div class="srcbar">
-  <i class="dot" id="srcDot"></i>
-  <span id="src">加载中…</span>
-  <span id="cost"></span>
+  <i class="dot" id="srcDot"></i><span id="src">加载中…</span><span id="cost"></span>
 </div>
 
 <div id="notice"></div>
-<div class="list" id="list">
-  <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-</div>
+<div class="list" id="list"><div class="empty">加载中…</div></div>
 
 <div class="tablewrap">
   <table>
@@ -200,11 +208,10 @@
       <th class="sortable num" data-k="peers">在线</th>
       <th class="sortable num" data-k="na">我方</th>
       <th class="sortable num" data-k="ne">敌方</th>
-      <th class="sortable num" data-k="nb">人机</th>
       <th>我方玩家</th>
-      <th>敌方玩家</th>
       <th class="sortable num" data-k="items">带价</th>
       <th class="sortable num" data-k="total">总价值</th>
+      <th class="sortable num" data-k="delta">趋势</th>
     </tr></thead>
     <tbody id="rows"></tbody>
   </table>
@@ -218,65 +225,149 @@
   var $=function(id){return document.getElementById(id);};
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
-  function wan(v){
-    v=v||0;
+  function wan(v){ v=v||0;
     if(v>=10000) return (v/10000).toFixed(v>=1000000?0:1).replace(/\.0$/,"")+"万";
-    return v.toLocaleString("en-US");
-  }
+    return v.toLocaleString("en-US"); }
   function full(v){ return (v||0).toLocaleString("en-US"); }
 
-  var rows=[], counts={}, filter="all", sortKey="total", sortAsc=false, timer=null, ok=false;
+  var rows=[], counts={}, history=[], filter="all", mapFilter="", sortKey="total", sortAsc=false;
+  var stars={}, alertOn=false, seen={};
 
+  /* ---------- 关注列表 ---------- */
+  try{ stars = JSON.parse(localStorage.getItem("dfm_stars")||"{}")||{}; }catch(e){ stars={}; }
+  function saveStars(){ try{ localStorage.setItem("dfm_stars", JSON.stringify(stars)); }catch(e){} }
+
+  /* ---------- 提醒 ---------- */
+  var MIN_ALERT = 500000;
+  function beep(){
+    try{
+      var C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+      var c = new C(), o = c.createOscillator(), g = c.createGain();
+      o.type = "sine"; o.frequency.value = 880;
+      g.gain.setValueAtTime(.001, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(.25, c.currentTime + .02);
+      g.gain.exponentialRampToValueAtTime(.001, c.currentTime + .35);
+      o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + .36);
+      setTimeout(function(){ try{ c.close(); }catch(e){} }, 600);
+    }catch(e){}
+  }
+  function notify(room, val){
+    beep();
+    toast("⭐ " + room + " 值得关注 · " + wan(val));
+    try{
+      if(window.Notification && Notification.permission === "granted"){
+        new Notification("DFM 雷达提醒", { body: room + " 号房间价值 " + full(val), tag: "dfm-"+room });
+      }
+    }catch(e){}
+  }
+
+  /* ---------- 数据 ---------- */
   function load(){
     fetch("./rooms.json?_="+Date.now(),{cache:"no-store"})
       .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
       .then(function(d){
         rows=(d.active||[]).concat(d.notentered||[]);
-        counts=d.counts||{};
-        ok=true;
+        counts=d.counts||{}; history=d.history||[];
         $("srcDot").className="dot";
         $("src").textContent="服务端扫描 · "+(d.generated_at||"");
         $("cost").textContent=d.cost_seconds?("· 耗时 "+d.cost_seconds+"s"):"";
         $("notice").innerHTML="";
-        paint(); render();
+        checkAlerts(d.active||[]);
+        paint(); renderSpark(); renderMaps(); render();
       })
       .catch(function(e){
-        ok=false;
         $("srcDot").className="dot off";
         $("src").textContent="读不到 rooms.json（"+e.message+"）";
-        $("notice").innerHTML='<div class="warnbox">服务端扫描暂时不可用。'+
-          '确认服务器上的 <b>radar-scan</b> 服务在运行，或稍后重试。</div>';
+        $("notice").innerHTML='<div class="warnbox">服务端扫描暂时不可用，确认服务器上的 <b>radar-scan</b> 服务在运行。</div>';
         if(!rows.length) $("list").innerHTML='<div class="empty"><div class="big">🛰️</div>暂无数据</div>';
       });
   }
 
+  function checkAlerts(list){
+    if(!alertOn) return;
+    list.forEach(function(r){
+      var key = r.room + "@" + (r.total||0);
+      if((r.total||0) >= MIN_ALERT && !seen[key] && (r.isnew || (r.delta||0) > 0)){
+        if(!seen[r.room] || (r.delta||0) > 0){
+          seen[r.room] = 1; notify(r.room, r.total);
+        }
+      }
+      seen[key]=1;
+    });
+  }
+
   function paint(){
     var peers=0,ally=0,enemy=0,total=0;
-    rows.forEach(function(r){
-      if(r.status==="active"){ peers+=r.peers||0; ally+=r.na||0; enemy+=r.ne||0; total+=r.total||0; }
-    });
+    rows.forEach(function(r){ if(r.status==="active"){
+      peers+=r.peers||0; ally+=r.na||0; enemy+=r.ne||0; total+=r.total||0; }});
     $("cActive").textContent=counts.active||0;
     $("cNot").textContent=counts.notentered||0;
-    $("cAlly").textContent=ally;
-    $("cEnemy").textContent=enemy;
-    $("cTotal").textContent=wan(total);
-    $("cClosed").textContent=counts.closed||0;
+    $("cAlly").textContent=ally; $("cEnemy").textContent=enemy;
+    $("cTotal").textContent=wan(total); $("cPeers").textContent=peers;
+  }
+
+  function renderSpark(){
+    var c=$("spark"); if(!c) return;
+    var vals=history.map(function(h){return h.value||0;});
+    var ctx=c.getContext("2d");
+    var W=c.width,H=c.height;
+    ctx.clearRect(0,0,W,H);
+    if(vals.length<2){ $("sparkTxt").textContent="—"; return; }
+    var mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals);
+    var span=(mx-mn)||1, pad=6;
+    ctx.strokeStyle="rgba(16,163,127,.9)"; ctx.lineWidth=2; ctx.lineJoin="round";
+    ctx.beginPath();
+    vals.forEach(function(v,i){
+      var x=pad+(W-2*pad)*i/(vals.length-1);
+      var y=H-pad-(H-2*pad)*(v-mn)/span;
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+    var last=vals[vals.length-1], prev=vals[vals.length-2];
+    var d=last-prev;
+    $("sparkTxt").innerHTML = wan(last) + ' <span class="delta '+(d>=0?"up":"down")+'">'+
+      (d>=0?"▲":"▼")+wan(Math.abs(d))+'</span>';
+  }
+
+  function renderMaps(){
+    var agg={};
+    rows.forEach(function(r){ if(r.status!=="active") return;
+      var m=r.map||"未知"; agg[m]=agg[m]||{n:0,v:0,best:0};
+      agg[m].n++; agg[m].v+=r.total||0; agg[m].best=Math.max(agg[m].best,r.total||0); });
+    var list=Object.keys(agg).map(function(k){return {m:k,o:agg[k]};})
+                   .sort(function(a,b){ return b.o.v-a.o.v; });
+    var h='<div class="mapcard'+(mapFilter?"":" on")+'" data-map=""><b>全部地图</b><span>'+
+          counts.active+' 房 · '+wan(list.reduce(function(s,x){return s+x.o.v;},0))+'</span></div>';
+    h+=list.map(function(x){
+      return '<div class="mapcard'+(mapFilter===x.m?" on":"")+'" data-map="'+esc(x.m)+'">'+
+             '<b>'+esc(x.m)+'</b><span>'+x.o.n+' 房 · '+wan(x.o.v)+' · 最高 '+wan(x.o.best)+'</span></div>';
+    }).join("");
+    $("maps").innerHTML=h;
   }
 
   function visible(){
     var q=($("q").value||"").trim().toLowerCase();
+    var minV=parseInt($("minVal").value,10)||0;
+    var minA=parseInt($("minAlly").value,10)||0;
     return rows.filter(function(r){
+      if(mapFilter && r.map!==mapFilter) return false;
+      if(filter==="star" && !stars[r.room]) return false;
       if(filter==="players" && !((r.na||0)+(r.ne||0))) return false;
       if(filter==="ally" && !(r.na>0)) return false;
       if(filter==="enemy" && !(r.ne>0)) return false;
       if(filter==="rich" && !((r.total||0)>=500000)) return false;
+      if(filter==="up" && !((r.delta||0)>0)) return false;
       if(filter==="notentered" && r.status!=="notentered") return false;
+      if(minV && (r.total||0)<minV) return false;
+      if(minA && (r.na||0)<minA) return false;
       if(!q) return true;
       if(String(r.room).indexOf(q)>=0) return true;
       if((r.map||"").toLowerCase().indexOf(q)>=0) return true;
       return (r.an||[]).concat(r.en||[]).some(function(n){
         return String(n).toLowerCase().indexOf(q)>=0; });
     }).sort(function(a,b){
+      var sa=stars[a.room]?1:0, sb=stars[b.room]?1:0;
+      if(sa!==sb) return sb-sa;                       // 关注的置顶
       var x=a[sortKey], y=b[sortKey];
       if(sortKey==="room"){ x=+x; y=+y; }
       if(typeof x==="string"){ return sortAsc?(x>y?1:-1):(x<y?1:-1); }
@@ -284,77 +375,134 @@
     });
   }
 
+  function deltaHtml(r){
+    if(r.isnew) return '<span class="delta new">● 新</span>';
+    var d=r.delta;
+    if(d==null) return '';
+    if(d===0) return '<span class="delta" style="color:var(--dim2)">—</span>';
+    return '<span class="delta '+(d>0?"up":"down")+'">'+(d>0?"▲":"▼")+wan(Math.abs(d))+'</span>';
+  }
+
   function render(){
     var list=visible();
-    /* 卡片 */
-    var L=$("list");
     if(!list.length){
-      L.innerHTML='<div class="empty"><div class="big">🔎</div>没有匹配的房间</div>';
-    } else {
-      L.innerHTML=list.slice(0,500).map(function(r){
+      $("list").innerHTML='<div class="empty"><div class="big">🔎</div>没有匹配的房间</div>';
+    }else{
+      $("list").innerHTML=list.slice(0,500).map(function(r){
         var not=r.status==="notentered";
         var hot=(r.total||0)>=500000;
         var names="";
         (r.an||[]).slice(0,8).forEach(function(n){ names+='<span class="nm a">'+esc(n)+'</span>'; });
         (r.en||[]).slice(0,8).forEach(function(n){ names+='<span class="nm e">'+esc(n)+'</span>'; });
-        return '<div class="room'+(hot?" hot":"")+(not?" idle":"")+'" data-room="'+r.room+'">'+
+        return '<div class="room'+(hot?" hot":"")+(stars[r.room]?" star":"")+'" data-room="'+r.room+'">'+
           '<div class="r1">'+
             '<span class="rno">'+r.room+'</span>'+
             '<span class="node">'+r.node+'号</span>'+
             '<span class="map">'+(not?'<span class="badge not">未进入</span>':esc(r.map||"?"))+'</span>'+
-            '<span class="val'+(r.total?"":" zero")+'">'+wan(r.total)+'</span>'+
+            deltaHtml(r)+
+            '<button class="star-btn'+(stars[r.room]?" on":"")+'" data-star="'+r.room+'">'+
+              (stars[r.room]?"★":"☆")+'</button>'+
           '</div>'+
-          '<div class="r2">'+
-            '<span>在线 <u>'+(r.peers||0)+'</u></span>'+
-            '<span class="a">我方 <u>'+(r.na||0)+'</u></span>'+
-            '<span class="e">敌方 <u>'+(r.ne||0)+'</u></span>'+
-            '<span class="b">人机 <u>'+(r.nb||0)+'</u></span>'+
-            '<span>带价 <u>'+(r.items||0)+'</u></span>'+
+          '<div class="r1" style="margin-top:5px">'+
+            '<span class="r2"><span>在线 <u>'+(r.peers||0)+'</u></span>'+
+            '<span class="a" style="margin-left:10px">我方 <u>'+(r.na||0)+'</u></span>'+
+            '<span class="e" style="margin-left:10px">敌方 <u>'+(r.ne||0)+'</u></span>'+
+            '<span style="margin-left:10px">带价 <u>'+(r.items||0)+'</u></span></span>'+
+            '<span class="val'+(r.total?"":" zero")+'" style="margin-left:auto">'+wan(r.total)+'</span>'+
           '</div>'+
           (names?'<div class="names">'+names+'</div>':'')+
+          '<div class="acts">'+
+            '<button class="btn" data-open="'+r.room+'">进入雷达</button>'+
+            '<button class="btn ghost" data-copy="'+r.room+'">复制房间号</button>'+
+          '</div>'+
         '</div>';
       }).join("");
     }
-    /* 表格 */
-    var tb=$("rows");
-    tb.innerHTML=list.slice(0,600).map(function(r){
+    $("rows").innerHTML=list.slice(0,600).map(function(r){
       var not=r.status==="notentered";
       var an=(r.an||[]).map(function(n){return '<span class="nm a">'+esc(n)+'</span>';}).join(" ");
-      var en=(r.en||[]).map(function(n){return '<span class="nm e">'+esc(n)+'</span>';}).join(" ");
       return '<tr data-room="'+r.room+'">'+
-        '<td><b>'+r.room+'</b></td><td>'+r.node+'</td>'+
+        '<td><b>'+r.room+'</b>'+(stars[r.room]?" ⭐":"")+'</td><td>'+r.node+'</td>'+
         '<td>'+(not?"未进入":esc(r.map||"?"))+'</td>'+
         '<td class="num">'+(r.peers||0)+'</td>'+
         '<td class="num" style="color:var(--ally)">'+(r.na||0)+'</td>'+
         '<td class="num" style="color:var(--enemy)">'+(r.ne||0)+'</td>'+
-        '<td class="num">'+(r.nb||0)+'</td>'+
-        '<td>'+an+'</td><td>'+en+'</td>'+
-        '<td class="num">'+(r.items||0)+'</td>'+
-        '<td class="num" style="color:var(--gold)"><b>'+full(r.total)+'</b></td></tr>';
+        '<td>'+an+'</td><td class="num">'+(r.items||0)+'</td>'+
+        '<td class="num" style="color:var(--gold)"><b>'+full(r.total)+'</b></td>'+
+        '<td class="num">'+deltaHtml(r)+'</td></tr>';
     }).join("");
   }
 
   function toast(msg){
-    var t=$("toast"); t.textContent=msg||"已复制房间号"; t.classList.add("show");
-    setTimeout(function(){ t.classList.remove("show"); }, 1100);
+    var t=$("toast"); t.textContent=msg; t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1300);
+  }
+  function copy(text){
+    try{ navigator.clipboard.writeText(text); return true; }catch(e){
+      try{ var ta=document.createElement("textarea"); ta.value=text;
+        document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+        document.body.removeChild(ta); return true; }catch(__){ return false; }
+    }
   }
 
-  /* 事件 */
+  /* ---------- CSV 导出 ---------- */
+  function exportCsv(){
+    var list=visible();
+    var head=["房间","节点","地图","在线","我方","敌方","带价物品","总价值","变化","我方玩家","敌方玩家"];
+    var lines=[head.join(",")];
+    list.forEach(function(r){
+      var cells=[r.room,r.node,r.status==="notentered"?"未进入":(r.map||""),
+        r.peers||0,r.na||0,r.ne||0,r.items||0,r.total||0,
+        r.isnew?"新":(r.delta==null?"":r.delta),
+        (r.an||[]).join(" / "),(r.en||[]).join(" / ")];
+      lines.push(cells.map(function(c){
+        c=String(c==null?"":c);
+        return /[",\n]/.test(c) ? '"'+c.replace(/"/g,'""')+'"' : c;
+      }).join(","));
+    });
+    var blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="dfm_rooms_"+new Date().toISOString().slice(0,19).replace(/[:T]/g,"")+".csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    toast("已导出 "+list.length+" 行");
+  }
+
+  /* ---------- 事件 ---------- */
   $("reload").addEventListener("click", function(){ load(); toast("已刷新"); });
+  $("csv").addEventListener("click", exportCsv);
   $("q").addEventListener("input", render);
   $("viewBtn").addEventListener("click", function(){
     document.body.classList.toggle("tableview");
-    var t=document.body.classList.contains("tableview");
-    $("viewTxt").textContent = t ? "卡片" : "表格";
+    $("viewTxt").textContent = document.body.classList.contains("tableview")?"卡片":"表格";
     render();
+  });
+  $("minVal").addEventListener("input", function(){
+    var v=parseInt(this.value,10)||0;
+    $("minValTxt").textContent = v?wan(v):"0";
+    render();
+  });
+  $("minAlly").addEventListener("change", render);
+  $("sound").addEventListener("click", function(){
+    if(!alertOn){
+      alertOn=true; this.classList.add("on"); this.textContent="🔔 提醒已开";
+      try{ if(window.Notification && Notification.permission==="default") Notification.requestPermission(); }catch(e){}
+      beep(); toast("高价值房间提醒已开启（≥50万）");
+    }else{
+      alertOn=false; this.classList.remove("on"); this.textContent="🔔 提醒";
+      toast("提醒已关闭");
+    }
   });
   document.querySelectorAll(".chip").forEach(function(c){
     c.addEventListener("click", function(){
       document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});
-      c.classList.add("on");
-      filter=c.getAttribute("data-f");
-      render();
+      c.classList.add("on"); filter=c.getAttribute("data-f"); render();
     });
+  });
+  $("maps").addEventListener("click", function(e){
+    var el=e.target.closest(".mapcard"); if(!el) return;
+    mapFilter = el.getAttribute("data-map") || "";
+    renderMaps(); render();
   });
   document.querySelectorAll("th.sortable").forEach(function(th){
     th.addEventListener("click", function(){
@@ -363,28 +511,26 @@
       render();
     });
   });
-  function copyRoom(el){
-    var room=el.getAttribute("data-room");
-    try{ navigator.clipboard.writeText(room); }catch(_){
-      try{ var ta=document.createElement("textarea"); ta.value=room;
-        document.body.appendChild(ta); ta.select(); document.execCommand("copy");
-        document.body.removeChild(ta); }catch(__){}
-    }
-    toast("房间号 "+room+" 已复制");
-  }
   $("list").addEventListener("click", function(e){
-    var el=e.target.closest(".room"); if(el) copyRoom(el);
+    var star=e.target.closest("[data-star]");
+    if(star){ var id=star.getAttribute("data-star");
+      if(stars[id]) delete stars[id]; else stars[id]=1;
+      saveStars(); render(); toast(stars[id]?"已关注 "+id:"已取消关注 "+id); return; }
+    var open=e.target.closest("[data-open]");
+    if(open){ window.open("index.html?room="+open.getAttribute("data-open"), "_blank"); return; }
+    var cp=e.target.closest("[data-copy]");
+    if(cp){ copy(cp.getAttribute("data-copy")); toast("房间号 "+cp.getAttribute("data-copy")+" 已复制"); return; }
+    var card=e.target.closest(".room");
+    if(card){ copy(card.getAttribute("data-room")); toast("房间号 "+card.getAttribute("data-room")+" 已复制"); }
   });
   $("rows").addEventListener("click", function(e){
-    var el=e.target.closest("tr[data-room]"); if(el) copyRoom(el);
+    var tr=e.target.closest("tr[data-room]"); if(!tr) return;
+    copy(tr.getAttribute("data-room")); toast("房间号 "+tr.getAttribute("data-room")+" 已复制");
   });
 
-  function tick(){
-    if($("auto").checked) load();
-    timer=setTimeout(tick, 20000);
-  }
+  function tick(){ if($("auto").checked) load(); setTimeout(tick, 20000); }
   load();
-  timer=setTimeout(tick, 20000);
+  setTimeout(tick, 20000);
 })();
 </script>
 </body>
