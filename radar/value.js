@@ -15,7 +15,17 @@
     5: ["cheap-host1.cheapyun.com", 41092]
   };
   var RELAY_WSS = "/ws?room=";                 // https 页面走 wss 中继
-  var RELAY_HOST = "imac-1.tailbdb43.ts.net";   // 中继所在主机（Tailscale）
+  /* 中继主机：优先 URL 参数 ?relay=xxx，其次 localStorage，最后默认值
+     —— 默认走 Cloudflare 隧道的固定域名（公网可用，不需要 Tailscale） */
+  var RELAY_HOST = (function () {
+    try {
+      var q = /[?&]relay=([^&]+)/.exec(location.search);
+      if (q) { var h = decodeURIComponent(q[1]); localStorage.setItem("dfm_relay_host", h); return h; }
+      var v = localStorage.getItem("dfm_relay_host");
+      if (v) return v;
+    } catch (e) {}
+    return "radar.fcefw.dpdns.org";
+  })();
   var SELF_HOSTS = ["imac-1.tailbdb43.ts.net", "127.0.0.1", "localhost"];
   var ADJUST_MS = 12000;                       // 心跳间隔
   var RADIUS_DEFAULT = 3000;                   // 邻近半径（厘米）= 30 米
