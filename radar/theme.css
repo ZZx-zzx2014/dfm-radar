@@ -1,176 +1,164 @@
 /* ==========================================================================
-   DFM 雷达 · 统一主题（必须在官方 styles.css 之后加载）
-   做法：只覆盖官方的 CSS 变量 + 少量不改变布局的质感修饰
-   —— 整站配色/圆角/阴影一次到位，且不会破坏官方布局
+   DFM 雷达 · 主题（轻便高效的 AI 工具风）
+   必须在官方 styles.css 之后加载。
+   做法：覆盖官方 CSS 变量 + 克制的质感修饰；不改变任何官方布局。
+   设计原则：中性灰阶 · 1px 细描边 · 无发光 · 无重渐变 · 8px 间距节奏
    ========================================================================== */
 :root {
   color-scheme: dark;
 
   /* ---- 官方变量（覆盖）---- */
-  --bg: #070b10;
-  --surface: #0e151d;
-  --surface-raised: #151f2a;
-  --line: #1e2b38;
-  --text: #e9f0f6;
-  --muted: #8a9bad;
-  --accent: #2fe0b0;
-  --accent-ink: #04241c;
-  --warning: #ffc84a;
-  --danger: #ff5f6d;
+  --bg: #0e0f11;
+  --surface: #16181b;
+  --surface-raised: #1c1f23;
+  --line: #26292e;
+  --text: #ececf1;
+  --muted: #9aa0a6;
+  --accent: #10a37f;
+  --accent-ink: #ffffff;
+  --warning: #e0a44a;
+  --danger: #e5646b;
 
-  /* ---- 我方面板共用令牌 ---- */
-  --dfm-bg: #070b10;
-  --dfm-card: rgba(13, 20, 28, .94);
-  --dfm-card-2: rgba(17, 26, 36, .92);
-  --dfm-line: rgba(120, 190, 175, .18);
-  --dfm-line-2: rgba(255, 255, 255, .08);
-  --dfm-text: #e9f0f6;
-  --dfm-muted: #8397aa;
-  --dfm-muted-2: #5f7488;
-  --dfm-accent: #2fe0b0;
-  --dfm-accent-ink: #04241c;
-  --dfm-ally: #5fe3c0;
-  --dfm-enemy: #ff5f6d;
-  --dfm-gold: #ffc84a;
-  --dfm-radius: 14px;
-  --dfm-radius-sm: 10px;
-  --dfm-shadow: 0 12px 34px rgba(0, 0, 0, .5);
+  /* ---- 面板共用令牌 ---- */
+  --dfm-bg: #0e0f11;
+  --dfm-card: #16181b;
+  --dfm-card-2: #1c1f23;
+  --dfm-line: #26292e;
+  --dfm-line-2: #2f3339;
+  --dfm-text: #ececf1;
+  --dfm-muted: #9aa0a6;
+  --dfm-muted-2: #6b7076;
+  --dfm-accent: #10a37f;
+  --dfm-accent-soft: rgba(16, 163, 127, .13);
+  --dfm-accent-line: rgba(16, 163, 127, .38);
+  --dfm-accent-ink: #ffffff;
+  --dfm-ally: #4fd1b0;
+  --dfm-enemy: #ef6b73;
+  --dfm-gold: #e3b341;
+  --dfm-radius: 12px;
+  --dfm-radius-sm: 8px;
+  --dfm-shadow: 0 6px 24px rgba(0, 0, 0, .38);
   --dfm-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
               system-ui, "Segoe UI", sans-serif;
 }
 
-/* ---------- 全局质感（不碰布局） ---------- */
+/* ---------- 全局：干净、无装饰 ---------- */
 html { background: var(--bg); }
 body {
-  background:
-    radial-gradient(1100px 620px at 50% -12%, #0c1a24 0%, rgba(7, 11, 16, 0) 62%),
-    radial-gradient(760px 420px at 92% 8%, rgba(47, 224, 176, .06) 0%, rgba(7, 11, 16, 0) 60%),
-    var(--bg) !important;
+  background: var(--bg) !important;
   font-family: var(--dfm-font);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 玻璃质感：官方已有的 .surface 等容器 */
+/* 玻璃质感全部去掉，换成实色 + 细描边 */
 .surface,
 .radar-header,
 .view-bar,
 .entry-screen,
 .join-card,
 .radar-bottom > * {
-  backdrop-filter: saturate(160%) blur(10px);
-  -webkit-backdrop-filter: saturate(160%) blur(10px);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
-
-/* 圆角与描边更柔和 */
-.surface,
-.join-card,
-.code-slot,
-.code-field {
-  border-color: var(--dfm-line-2) !important;
-}
-
-/* 交互反馈 */
-button:not(:disabled):hover { filter: brightness(1.07); }
-button:not(:disabled):active { transform: scale(.985); }
-
-::selection { background: var(--dfm-accent); color: var(--dfm-accent-ink); }
-
-/* 滚动条 */
-* { scrollbar-width: thin; scrollbar-color: #22303d transparent; }
-*::-webkit-scrollbar { width: 8px; height: 8px; }
-*::-webkit-scrollbar-thumb { background: #22303d; border-radius: 8px; }
-*::-webkit-scrollbar-thumb:hover { background: #2d3f4f; }
-*::-webkit-scrollbar-track { background: transparent; }
 
 /* ==========================================================================
-   精修层：入场页 / 按钮 / 卡片 / 图例 —— 只加质感，不改布局
+   入场页
    ========================================================================== */
-
-/* ---- 入场页：加入雷达房间 ---- */
 .join-card {
-  position: relative;
-  border: 1px solid rgba(47, 224, 176, .22) !important;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, .55),
-    0 0 0 1px rgba(47, 224, 176, .06) inset,
-    0 0 60px rgba(47, 224, 176, .07);
-  animation: dfmRise .5s cubic-bezier(.22,.9,.3,1) both;
+  border: 1px solid var(--dfm-line) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .4);
+  animation: dfmRise .32s cubic-bezier(.2,.8,.3,1) both;
 }
 @keyframes dfmRise {
-  from { opacity: 0; transform: translateY(14px) scale(.985); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
-.entry-emblem {
-  filter: drop-shadow(0 0 12px rgba(47, 224, 176, .45));
-}
+.entry-emblem { filter: none; }
 
-/* ---- 房间号输入：聚焦时发光 ---- */
+/* 房间号输入 */
 .code-field:focus-within {
-  box-shadow: 0 0 0 3px rgba(47, 224, 176, .14), 0 0 22px rgba(47, 224, 176, .12);
-  border-color: rgba(47, 224, 176, .5) !important;
+  border-color: var(--dfm-accent-line) !important;
+  box-shadow: 0 0 0 3px var(--dfm-accent-soft);
 }
 .code-slot {
-  background: rgba(255, 255, 255, .035);
-  transition: background .15s, border-color .15s, transform .15s;
+  background: var(--dfm-card-2);
+  border-radius: 8px;
+  transition: background .14s, border-color .14s;
 }
 .code-slot.is-active {
-  background: rgba(47, 224, 176, .1);
-  border-color: rgba(47, 224, 176, .55) !important;
-  transform: translateY(-1px);
+  background: var(--dfm-accent-soft);
+  border-color: var(--dfm-accent-line) !important;
 }
 
-/* ---- 主按钮：渐变 + 投影 + 悬浮上浮 ---- */
+/* 主按钮：实色，无渐变 */
 .join-button, .join-button:not(:disabled) {
-  background: linear-gradient(135deg, #2fe0b0 0%, #22c39b 55%, #1aa887 100%) !important;
-  color: var(--accent-ink, #04241c) !important;
+  background: var(--dfm-accent) !important;
+  color: #fff !important;
   border: none !important;
-  box-shadow: 0 8px 22px rgba(47, 224, 176, .26);
-  transition: transform .15s, box-shadow .2s, filter .2s;
+  box-shadow: none;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: background .14s, transform .14s;
 }
-.join-button:not(:disabled):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(47, 224, 176, .34);
-}
+.join-button:not(:disabled):hover { background: #0e9070 !important; }
+.join-button:not(:disabled):active { transform: scale(.985); }
 
-/* ---- 顶栏 / 视图切换 ---- */
+/* ==========================================================================
+   顶栏 / 视图切换
+   ========================================================================== */
 .radar-header, .view-bar {
-  border-bottom: 1px solid rgba(255, 255, 255, .06) !important;
+  border-bottom: 1px solid var(--dfm-line) !important;
+  background: var(--surface) !important;
 }
 .view-switch button[aria-pressed="true"],
 .view-switch .is-active {
-  background: linear-gradient(180deg, rgba(47,224,176,.22), rgba(47,224,176,.10)) !important;
+  background: var(--dfm-accent-soft) !important;
   color: var(--accent) !important;
+  box-shadow: inset 0 0 0 1px var(--dfm-accent-line);
 }
 
-/* ---- 图例 / 底部统计 ---- */
+/* ==========================================================================
+   图例 / 统计 / 工具
+   ========================================================================== */
 .legend-item {
-  background: rgba(255, 255, 255, .04);
+  background: var(--dfm-card-2);
+  border: 1px solid var(--dfm-line);
   border-radius: 999px;
   padding: 3px 10px;
 }
-.marker-key { box-shadow: 0 0 6px currentColor; }
+.marker-key { box-shadow: none; }
 
-/* ---- 悬浮面板 / 工具按钮 ---- */
 .map-tools button {
-  background: rgba(12, 19, 26, .88) !important;
-  border: 1px solid rgba(255, 255, 255, .08) !important;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .38);
-  transition: transform .15s, border-color .15s, background .15s;
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--dfm-line) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+  border-radius: 10px;
+  transition: background .14s, border-color .14s;
 }
 .map-tools button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(47, 224, 176, .45) !important;
-  background: rgba(20, 32, 42, .95) !important;
+  background: #23272c !important;
+  border-color: var(--dfm-line-2) !important;
+  transform: none;
 }
 
-/* ---- 连接状态指示 ---- */
-#connection-dot { box-shadow: 0 0 10px currentColor; }
+#connection-dot { box-shadow: none; }
 
-/* ---- 全局过渡 ---- */
-a, button, input, select, .surface, .legend-item { transition: color .15s, background .15s, border-color .15s; }
-
-/* ---- 键盘可达性 ---- */
+/* ==========================================================================
+   通用：焦点 / 滚动条 / 选中
+   ========================================================================== */
 :focus-visible {
-  outline: 2px solid rgba(47, 224, 176, .65);
+  outline: 2px solid var(--dfm-accent-line);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
+}
+::selection { background: var(--dfm-accent-soft); color: var(--dfm-text); }
+
+* { scrollbar-width: thin; scrollbar-color: #2f3339 transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #2f3339; border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: #3a3f45; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+a, button, input, select, .surface, .legend-item {
+  transition: color .14s, background .14s, border-color .14s;
 }
