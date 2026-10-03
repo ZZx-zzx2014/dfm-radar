@@ -37,89 +37,6 @@ if (!/[?&]diag=1/.test(location.search)) return;
     var p = panel(); if (p) { p.textContent = logs.join('\n'); p.scrollTop = p.scrollHeight; }
     try { console.log('[WS]', s); } catch (e) {}
   }
-<script>
-/* ===== 卡密验证门 ===== */
-(function () {
-  var API = 'https://panel.fcefw.dpdns.org/api/key/verify';
-  function device() {
-    var d = localStorage.getItem('dfm_device');
-    if (!d) { d = 'd' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem('dfm_device', d); }
-    return d;
-  }
-  function style() { /* 注入样式 */
-    var st = document.createElement('style');
-    st.textContent = '#kkey-mask{position:fixed;inset:0;z-index:100000;background:rgba(8,9,11,.94);' +
-      'display:grid;place-items:center;padding:20px;font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC",system-ui,sans-serif;color:#ececf1}' +
-      '#kkey-mask .c{width:100%;max-width:360px;background:#16181b;border:1px solid #26292e;border-radius:14px;padding:22px;text-align:center}' +
-      '#kkey-mask h2{margin:0 0 6px;font-size:17px}#kkey-mask p{margin:0 0 16px;font-size:12.5px;color:#9aa0a6}' +
-      '#kkey-in{width:100%;padding:12px;font:600 16px/1.4 ui-monospace,Menlo,monospace;letter-spacing:2px;text-align:center;' +
-      'background:#1c1f23;border:1px solid #2f3339;border-radius:9px;color:#ececf1;outline:none;text-transform:uppercase}' +
-      '#kkey-in:focus{border-color:rgba(16,163,127,.55)}' +
-      '#kkey-btn{width:100%;margin-top:12px;padding:12px;border:none;border-radius:9px;background:#10a37f;color:#fff;font:600 15px inherit;cursor:pointer}' +
-      '#kkey-msg{margin-top:11px;font-size:12.5px;min-height:18px;color:#ef6b73}' +
-      '#kkey-badge{position:fixed;left:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:99997;background:rgba(16,163,127,.14);' +
-      'border:1px solid rgba(16,163,127,.4);color:#7fe3c0;border-radius:999px;padding:3px 10px;font:600 11px/1.5 system-ui,sans-serif}';
-    document.head.appendChild(st);
-  }
-  function show(msg) {
-    style();
-    if (document.getElementById('kkey-mask')) return;
-    var m = document.createElement('div');
-    m.id = 'kkey-mask';
-    m.innerHTML = '<div class="c"><h2>🔑 请输入卡密</h2>' +
-      '<p>本工具需要有效卡密才能使用<br>（一个卡密绑定一台设备）</p>' +
-      '<input id="kkey-in" placeholder="XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">' +
-      '<button id="kkey-btn">验证并进入</button>' +
-      '<div id="kkey-msg">' + (msg || '') + '</div></div>';
-    document.body.appendChild(m);
-    var inp = document.getElementById('kkey-in');
-    try { inp.focus(); } catch (e) {}
-    function go() {
-      var v = (inp.value || '').trim().toUpperCase();
-      if (v.length < 8) { document.getElementById('kkey-msg').textContent = '请输入完整卡密'; return; }
-      document.getElementById('kkey-msg').textContent = '验证中…';
-      document.getElementById('kkey-msg').style.color = '#9aa0a6';
-      verify(v, false);
-    }
-    document.getElementById('kkey-btn').addEventListener('click', go);
-    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
-  }
-  function hide() { var m = document.getElementById('kkey-mask'); if (m) m.remove(); }
-  function badge(code, days) {
-    style();
-    var b = document.getElementById('kkey-badge');
-    if (!b) { b = document.createElement('div'); b.id = 'kkey-badge'; document.body.appendChild(b); }
-    b.textContent = '🔑 ' + code.slice(0, 4) + '****' + code.slice(-4) + (days != null ? ' · 剩 ' + days + ' 天' : '');
-    b.title = '卡密 ' + code;
-    b.style.display = 'block';
-  }
-  function verify(k, silent) {
-    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: k, device: device() }) })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (d && d.ok) {
-          localStorage.setItem('dfm_key', k);
-          badge(k.toUpperCase(), d.remainDays);
-          hide();
-        } else {
-          localStorage.removeItem('dfm_key');
-          var el = document.getElementById('kkey-msg');
-          if (el) { el.style.color = '#ef6b73'; el.textContent = (d && d.msg) || '卡密无效'; }
-          else { show((d && d.msg) || '卡密无效'); }
-        }
-      })
-      .catch(function () {
-        if (silent) { show('网络异常，无法验证卡密（请检查网络后重试）'); }
-        else {
-          var el = document.getElementById('kkey-msg');
-          if (el) { el.style.color = '#ef6b73'; el.textContent = '网络异常，请重试'; }
-        }
-      });
-  }
-  var saved = localStorage.getItem('dfm_key');
-  if (saved) { verify(saved, true); } else { show(''); }
-})();
-</script>
   window.__wsDiag = add;
   var Orig = window.WebSocket;
   function Wrapped(url, protocols) {
@@ -147,7 +64,7 @@ if (!/[?&]diag=1/.test(location.search)) return;
   });
 })();
 </script>
-  <script type="module" src="./assets/app.js?v=5"></script>
+  <script type="module" src="./assets/app.js?v=4"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
