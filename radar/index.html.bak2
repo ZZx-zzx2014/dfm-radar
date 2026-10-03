@@ -14,8 +14,6 @@
   <script defer src="https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/leaflet.js"></script>
 <script>
 /* ===== WS 诊断：记录每一次 WebSocket 连接（点浮层可关闭） ===== */
-/* 临时禁用：默认不显示诊断浮层；需要时在网址后加 ?diag=1 打开 */
-if (!/[?&]diag=1/.test(location.search)) return;
 (function () {
   var logs = [], el = null;
   function panel() {
@@ -64,7 +62,7 @@ if (!/[?&]diag=1/.test(location.search)) return;
   });
 })();
 </script>
-  <script type="module" src="./assets/app.js?v=4"></script>
+  <script type="module" src="./assets/app.js?v=3"></script>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -168,6 +166,6 @@ if (!/[?&]diag=1/.test(location.search)) return;
   <script src="./patch.js?v=8"></script>
   <script src="./debug.js?v=8"></script>
   <script src="./value.js?v=8"></script>
-  <script src="./chat.js?v=10"></script>
+  <script src="./chat.js?v=9"></script>
 </body>
 </html>
