@@ -111,23 +111,8 @@
 
   /* ---------- 连接 ---------- */
   function url(r) {
-    /* 聊天服务地址：
-       - http 页面（服务器直连）→ 同源 /chat（nginx 反代到聊天服务）
-       - https 页面（GitHub Pages）→ 走 Cloudflare 隧道的 chat.fcefw.dpdns.org
-       可用 ?chathost=xxx 或 localStorage.dfm_chat_host 覆盖 */
-    var CHAT_HOST = (function () {
-      try {
-        var q = /[?&]chathost=([^&]+)/.exec(location.search);
-        if (q) { var h = decodeURIComponent(q[1]); localStorage.setItem("dfm_chat_host", h); return h; }
-        var v = localStorage.getItem("dfm_chat_host");
-        if (v) return v;
-      } catch (e) {}
-      return "chat.fcefw.dpdns.org";
-    })();
-    if (location.protocol === "https:") {
-      return "wss://" + CHAT_HOST + "/chat?room=" + r + "&name=" + encodeURIComponent(name);
-    }
-    return "ws://" + location.host + "/chat?room=" + r + "&name=" + encodeURIComponent(name);
+    var scheme = (location.protocol === "https:") ? "wss:" : "ws:";
+    return scheme + "//" + location.host + "/chat?room=" + r + "&name=" + encodeURIComponent(name);
   }
 
   function close(silent) {
