@@ -210,7 +210,7 @@
                  '<div class="dvp-bar"><i style="width:' + Math.round(100 * r.sum / max) +
                  '%;background:' + color + '"></i></div></span>' +
                  '<span class="dvp-val" style="color:' + color + '">' + fmt(r.sum) +
-                 '<em>独 ' + fmt(r.ex) + ' · ' + r.n + '件</em></span></div>';
+                 '<em>独占 ' + fmt(r.ex) + ' · ' + r.n + '件</em></span></div>';
         }).join("");
       }
     }
