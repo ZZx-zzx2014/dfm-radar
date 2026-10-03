@@ -34,7 +34,7 @@
       '</div>' +
       '<div id="dvp-body">' +
         '<div id="dvp-total"><b id="dvp-sum">0</b><em>已知价格合计</em></div>' +
-        '<div class="dvp-sec"><h4><span>玩家（推断）</span><span>邻近物资 / 价值</span></h4>' +
+        '<div class="dvp-sec"><h4><span>玩家 · 附近价值（附独占）</span><span>数值 / 件数</span></h4>' +
           '<div id="dvp-players"><div class="dvp-empty">未连接</div></div></div>' +
         '<div class="dvp-sec"><h4><span>带价物资</span><span id="dvp-icount">0 件</span></h4>' +
           '<div id="dvp-items"><div class="dvp-empty">—</div></div></div>' +
@@ -171,17 +171,24 @@
       var dx = a.x - b.x, dy = a.y - b.y, dz = (a.z || 0) - (b.z || 0);
       return dx * dx + dy * dy + dz * dz;
     }
-    var buckets = {};
-    players.forEach(function (p) { buckets[p.id] = { p: p, sum: 0, n: 0 }; });
+    /* 两种口径同时算：
+       ① 附近 —— 半径内所有物资都算（同一件可同时算给多个玩家）
+       ② 独占 —— 每件只算给距离最近的那个玩家 */
+    var near = {}, excl = {};
+    players.forEach(function (p) { near[p.id] = { p: p, sum: 0, n: 0 }; excl[p.id] = 0; });
     items.forEach(function (it) {
+      players.forEach(function (p) {
+        var dd = d2(p, it);
+        if (radius > 0 && Math.sqrt(dd) > radius) return;
+        near[p.id].sum += it.price; near[p.id].n++;
+      });
       var best = null, bd = Infinity;
       players.forEach(function (p) { var dd = d2(p, it); if (dd < bd) { bd = dd; best = p; } });
-      if (!best) return;
-      if (radius > 0 && Math.sqrt(bd) > radius) return;
-      var b = buckets[best.id]; if (b) { b.sum += it.price; b.n++; }
+      if (best && !(radius > 0 && Math.sqrt(bd) > radius)) excl[best.id] += it.price;
     });
-    var rows = Object.keys(buckets).map(function (k) { return buckets[k]; })
-                     .sort(function (a, b) { return b.sum - a.sum; });
+    var rows = Object.keys(near).map(function (k) {
+      return { p: near[k].p, sum: near[k].sum, n: near[k].n, ex: excl[k] || 0 };
+    }).sort(function (a, b) { return b.sum - a.sum; });
 
     var total = items.reduce(function (s, x) { return s + x.price; }, 0);
     if ($("dvp-sum")) $("dvp-sum").textContent = fmt(total);
@@ -196,14 +203,14 @@
         var max = rows[0].sum || 1;
         pb.innerHTML = rows.map(function (r) {
           var p = r.p, ally = p.kind === "ally";
-          var color = ally ? "#7ce4cd" : "#ff5252";
+          var color = ally ? "var(--dfm-ally, #4fd1b0)" : "var(--dfm-enemy, #ef6b73)";
           return '<div class="dvp-row"><i class="dvp-chip" style="background:' + color + '"></i>' +
                  '<span class="dvp-name"><span class="dvp-tag ' + (ally ? "dvp-ally" : "dvp-enemy") + '">' +
                  (ally ? "友" : "敌") + '</span> ' + esc(p.label) +
                  '<div class="dvp-bar"><i style="width:' + Math.round(100 * r.sum / max) +
                  '%;background:' + color + '"></i></div></span>' +
                  '<span class="dvp-val" style="color:' + color + '">' + fmt(r.sum) +
-                 '</span><span class="dvp-tag">' + r.n + '件</span></div>';
+                 '<em>独 ' + fmt(r.ex) + ' · ' + r.n + '件</em></span></div>';
         }).join("");
       }
     }

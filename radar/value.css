@@ -56,7 +56,15 @@
   flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   color: var(--dfm-text, #ececf1);
 }
-.dvp-row .dvp-val { font-variant-numeric: tabular-nums; font-weight: 600; }
+.dvp-row .dvp-val {
+  font-variant-numeric: tabular-nums; font-weight: 600;
+  display: flex; flex-direction: column; align-items: flex-end; line-height: 1.25;
+  white-space: nowrap;
+}
+.dvp-row .dvp-val em {
+  font-style: normal; font-size: 10.5px; font-weight: 400;
+  color: var(--dfm-muted-2, #6b7076);
+}
 .dvp-chip { width: 8px; height: 8px; border-radius: 2px; flex: none; }
 .dvp-bar {
   height: 3px; border-radius: 2px; background: rgba(255,255,255,.07);
