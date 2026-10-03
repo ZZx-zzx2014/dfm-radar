@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="./theme.css?v=8">
   <link rel="stylesheet" href="./value.css?v=8">
   <link rel="stylesheet" href="./chat.css?v=8">
-  <link rel="stylesheet" href="./theme-pro.css?v=1">
   <script defer src="https://game.gtimg.cn/images/dfm/cp/a20240729directory/js/lib/leaflet.js"></script>
 <script>
 /* ===== WS 诊断：记录每一次 WebSocket 连接（点浮层可关闭） ===== */
