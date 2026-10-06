@@ -1,0 +1,32 @@
+/* 数据面板 */
+.panel {
+  position: fixed; right: 10px; top: calc(64px + env(safe-area-inset-top));
+  width: 268px; max-width: calc(100vw - 20px); max-height: calc(100vh - 150px);
+  overflow: auto; padding: 14px; z-index: 38;
+  background: linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,0)), var(--c-surface);
+  border: 1px solid var(--c-line); border-radius: var(--r-md); box-shadow: var(--sh-3);
+}
+.panel-head { margin-bottom: 12px; }
+.panel-eyebrow { display: block; font-size: 10px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--c-fg-4); margin-bottom: 4px; }
+.panel-map { font-size: 16px; font-weight: 650; letter-spacing: .01em; }
+.panel-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+.panel-stat { padding: 8px 10px; background: var(--c-surface-2); border: 1px solid var(--c-line);
+  border-radius: var(--r-sm); }
+.panel-stat b { display: block; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.panel-stat span { font-size: 11px; color: var(--c-fg-4); }
+.panel-stat.is-accent b { color: var(--c-accent); }
+.panel-stat.is-warn b { color: var(--c-warn); }
+.panel-stat.is-info b { color: #4a8fe0; }
+.panel-sub { font-size: 11px; color: var(--c-fg-4); margin-bottom: 7px;
+  letter-spacing: .08em; text-transform: uppercase; }
+.panel-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12.5px;
+  border-bottom: 1px solid rgba(255,255,255,.04); }
+.panel-row:last-child { border-bottom: none; }
+.panel-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.panel-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel-kind { color: var(--c-fg-4); font-size: 11px; }
+.panel-empty { font-size: 12px; color: var(--c-fg-4); }
+@media (max-width: 700px) {
+  .panel { left: 10px; right: 10px; width: auto; top: calc(104px + env(safe-area-inset-top)); max-height: 42vh; }
+}

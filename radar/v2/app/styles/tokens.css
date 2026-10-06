@@ -1,0 +1,38 @@
+/* ==========================================================================
+   DFM RADAR · 设计令牌（商业级）
+   ========================================================================== */
+:root {
+  --c-bg:        #0b0d10;
+  --c-surface:   #16191e;
+  --c-surface-2: #1c2027;
+  --c-surface-3: #232830;
+  --c-line:      #262b33;
+  --c-line-2:    #343b45;
+
+  --c-fg:   #f2f4f7;
+  --c-fg-2: #b9c0ca;
+  --c-fg-3: #8b939e;
+  --c-fg-4: #5f6772;
+
+  --c-accent:      #10a37f;
+  --c-accent-2:    #0d8a6a;
+  --c-accent-soft: rgba(16,163,127,.12);
+  --c-accent-line: rgba(16,163,127,.42);
+  --c-danger:      #e5646b;
+  --c-warn:        #d9a441;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+          "Microsoft YaHei", system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --r-xs: 6px; --r-sm: 9px; --r-md: 12px; --r-lg: 16px; --r-full: 999px;
+
+  --sh-1: 0 1px 2px rgba(0,0,0,.28), 0 1px 1px rgba(0,0,0,.18);
+  --sh-2: 0 4px 14px rgba(0,0,0,.34), 0 1px 3px rgba(0,0,0,.22);
+  --sh-3: 0 16px 48px rgba(0,0,0,.48), 0 4px 12px rgba(0,0,0,.30);
+  --sh-accent: 0 6px 20px rgba(16,163,127,.22);
+
+  --ease: cubic-bezier(.16,.84,.44,1);
+  --t-fast: .14s var(--ease);
+  --t: .22s var(--ease);
+}
